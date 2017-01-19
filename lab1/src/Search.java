@@ -1,5 +1,3 @@
-package lab1;
-
 public class Search {
 	
 	public static int search(int[] A, int[] B){

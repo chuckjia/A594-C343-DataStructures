@@ -44,6 +44,8 @@ public class Fibonacci {
   public static void main(String... args) {
     assert fib1(9) == 55;
     assert fib2(9) == 55;
+    assert fib2(2) == 2;
+    assert fib2(3) == 3;
   }
   
   /**

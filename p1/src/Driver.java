@@ -1,6 +1,6 @@
 /**
  * TODO
- * @ Chuck Jia (your name goes here)
+ * @ Chuck Jia
  */
 
 public class Driver {
@@ -18,7 +18,7 @@ public class Driver {
 	  int w = image.getWidth();
 	  int h = image.getHeight();
 	  ColorTable table = new ColorTable(3, bitsPerChannel, Constants.QUADRATIC, rehashThreshold);
-	  
+
 	  for(int i = 0; i < w; i++){
 		  for(int j = 0; j < h; j++){
 			  table.increment(image.getColor(i, j));
@@ -37,8 +37,8 @@ public class Driver {
   public static double similarity(Image image1, Image image2, int bitsPerChannel) {
 	  ColorTable A = vectorize(image1, bitsPerChannel);
 	  ColorTable B = vectorize(image2, bitsPerChannel);
-	
-      return Util.cosineSimilarity(A, B);
+
+	  return Util.cosineSimilarity(A, B);
   }
 
   /**

@@ -179,11 +179,13 @@ public class Testing {
     table.put(Color.BLACK, 5);
     assertEquals(1, table.getSize());
     //assertEquals(19, table.getCapacity());
+    assertEquals(11, table.getCapacity());  // My new test
     assertEquals(true, table.getLoadFactor() < 0.1);
     assertEquals(5, table.get(Color.BLACK));
     table.put(Color.WHITE, 5);
     assertEquals(2, table.getSize());
     //assertEquals(43, table.getCapacity());
+    assertEquals(23, table.getCapacity());  // My new test
     assertEquals(true, table.getLoadFactor() < 0.1);
     for (int c = 0xFF; c >= 0xF0; c--)
       table.put(new Color(c, c, c), c);

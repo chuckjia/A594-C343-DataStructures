@@ -22,47 +22,49 @@ public class Util {
 	  int bitsPerChannel = A.getBitsPerChannel();
 	  Iterator Ait = A.iterator();
 	  Iterator Bit = B.iterator();
-	  
+
 	  while(Ait.hasNext()){
 		  sum = sum + Ait.next()*Bit.next();
 	  }
-	  
+
 	  return sum; 
   }
   
   public static double vectorMag(ColorTable A){
 	  double sum = 0;
-	  
-	  for(int i = 0; i < A.getCapacity(); i++){
-		  sum = sum + A.getCountAt(i) * A.getCountAt(i);
+	  Iterator Ait = A.iterator();
+
+	  while(Ait.hasNext()){
+		  double temp = Ait.next();
+		  sum = sum + temp*temp;
 	  }
-	  
+
 	  return Math.sqrt(sum); 
   }
   
   
   public static double cosineSimilarity(ColorTable A, ColorTable B) {
-	  
-    return dotProd(A, B)/(vectorMag(A)*vectorMag(B));
+	  return dotProd(A, B)/(vectorMag(A)*vectorMag(B));
   }
  
   /**
    * Returns true iff n is a prime number. We handles several common cases quickly, and then 
    * use a variation of the Sieve of Eratosthenes.
    */
+  
   public static boolean isPrime(int n) {
-    if (n < 2) 
-      return false;
-    if (n == 2 || n == 3) 
-      return true;
-    if (n % 2 == 0 || n % 3 == 0) 
-      return false;
-    long sqrtN = (long) Math.sqrt(n) + 1;
-    for (int i = 6; i <= sqrtN; i += 6) {
-      if (n % (i - 1) == 0 || n % (i + 1) == 0) 
-        return false;
-    }
-    return true;
+	  if (n < 2) 
+		  return false;
+	  if (n == 2 || n == 3) 
+		  return true;
+	  if (n % 2 == 0 || n % 3 == 0) 
+		  return false;
+	  long sqrtN = (long) Math.sqrt(n) + 1;
+	  for (int i = 6; i <= sqrtN; i += 6) {
+		  if (n % (i - 1) == 0 || n % (i + 1) == 0) 
+			  return false;
+	  }
+	  return true;
   }
     
   /**

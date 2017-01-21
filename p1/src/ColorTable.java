@@ -18,7 +18,7 @@ import java.util.Random;
  * comments. Be sure to document all data fields and helper methods you define.
  */
 
-public class ColorTable {
+public class ColorTable{
   /**
    * Counts the number of collisions during an operation.
    */
@@ -29,7 +29,7 @@ public class ColorTable {
    * put operation.
    */
   public static int getNumCollisions() {
-    return numCollisions;
+	  return numCollisions;
   }
 
 
@@ -54,11 +54,16 @@ public class ColorTable {
   private int collisionStrategy;
   private double rehashThreshold;
   
-  public ColorTable(int initialCapacity, int bitsPerChannel, int collisionStrategy, double rehashThreshold) { 
-    this.table = new TableElem[initialCapacity];    
-    this.bitsPerChannel = bitsPerChannel;
-    this.collisionStrategy = collisionStrategy;
-    this.rehashThreshold = rehashThreshold; 
+  public ColorTable(int initialCapacity, int bitsPerChannel, int collisionStrategy, double rehashThreshold) {
+	  if( !(initialCapacity >= 1 && initialCapacity <= Constants.MAX_CAPACITY) )
+		  throw new RuntimeException("Invalid value for starting capacity.");
+	  if( !(bitsPerChannel >= 1 && bitsPerChannel <= 8) )
+		  throw new RuntimeException("Invalid value for bits per channel.");
+	  
+	  this.table = new TableElem[initialCapacity];    
+	  this.bitsPerChannel = bitsPerChannel;
+	  this.collisionStrategy = collisionStrategy;
+	  this.rehashThreshold = rehashThreshold; 
   }
 
   /**
@@ -72,8 +77,7 @@ public class ColorTable {
   }
 
   
-  public int lookup(Color color, TableElem[] table){
-	  
+  public int lookup(Color color, TableElem[] table){	  
 	  int colorkey = Util.pack(color, bitsPerChannel);
 	  int start = colorkey % table.length;
 	  int i = start;
@@ -104,11 +108,11 @@ public class ColorTable {
   public long get(Color color) {
 	  int i = lookup(color, table);
 	  
-	  if(table[i].key == Util.pack(color, bitsPerChannel)){
-		return table[i].value;  
-	  }else{
-		return 0;
+	  if(table[i] == null){
+		  return 0;
 	  }
+	  return table[i].value;  
+
 	
   }
 
@@ -217,16 +221,17 @@ public class ColorTable {
    * @throws RuntimeException if the table is already at maximum capacity.
    */
   private void rehash() { 
-	int currentSize = getCapacity(); 
-	int j = 2 * currentSize + 1;
+	int tableLength = getCapacity();
+	double tableElemNum = getSize();
+	int j = 2 * tableLength + 1;
 	
-	while((!(Util.isPrime(j) && (j % 4 == 3))) && j < Constants.MAX_CAPACITY){
-		j++;
+	while( ( !(Util.isPrime(j) && (j % 4 == 3) && (tableElemNum/j < rehashThreshold)) ) && j < Constants.MAX_CAPACITY){
+		j += 2; // Only need to traverse all odd numbers
 	}
 	
     TableElem[] newTable = new TableElem[j];
     
-    for(int i = 0; i < currentSize; i++){
+    for(int i = 0; i < tableLength; i++){
     	if(table[i] != null){
     		int k = lookup(Util.unpack(table[i].key, bitsPerChannel), newTable);
     		if(newTable[k] == null){ // for robustness, might have problems later
@@ -244,24 +249,41 @@ public class ColorTable {
    * Returns an Iterator that marches through each color in the key color space and
    * returns the sequence of frequency counts.
    */
-  public Iterator iterator() {
-    return new Iterator(){
-    	int curr = 0;
-    	int end = table.length -1;
+	  
+   public Iterator iterator() {
+       return new Iterator(){
+    	   private int r = 0;
+    	   private int g = 0;
+    	   private int b = 0;
+    	   private int inc = (int) Math.pow(2, 8 - bitsPerChannel);
     	
-    	public long next(){
-    		while(table[curr] == null){
-    			curr++;
-    		}
-    		curr++;
-    		return table[curr-1].value;
-    	}
+    	   public boolean hasNext(){
+    		   if((r < 255 || g < 255 || b < 255) && r <= 255 && g <= 255 && b <= 255){
+    		       return true;
+    		   }
+    		   return false;
+    	   }
     	
-    	public boolean hasNext(){
-    		return curr < end;    		
-    	}
-    };
+    	   public long next(){
+    		   Color color = new Color(r,g,b);
+    		   if(b + inc < 256){
+    			   b = b + inc;
+    		   }else{ 
+    			   if(g + inc < 256){
+    			       b = 0;
+    			       g = g + inc;
+    			   }else{
+    				   b = 0;
+    				   g = 0;
+    				   r = r + inc;
+    			   }
+    		   }
+    		   return get(color);
+    	   }
+       };
+
   }
+ 
 
   /**
    * TODO
@@ -289,7 +311,10 @@ public class ColorTable {
    * The sole purpose of this function is to aid in writing the unit tests.
    */
   public long getCountAt(int i) { 
-    return table[i].value;
+	  if(table[i] == null){
+		  return 0;
+	  }
+      return table[i].value;
   }
 
   /**
@@ -318,5 +343,6 @@ public class ColorTable {
        and readable.
        */
     System.out.println(table);  
+    
   }
 }

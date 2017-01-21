@@ -1,7 +1,7 @@
 import java.awt.Color;
 
 public class Util {
-  
+
   /*
    * TODO
    * 
@@ -17,21 +17,33 @@ public class Util {
    *    color table.
    */
 	
-  public double dotProd(ColorTable A, ColorTable B){
+  public static double dotProd(ColorTable A, ColorTable B){
 	  double sum = 0;
+	  int bitsPerChannel = A.getBitsPerChannel();
+	  Iterator Ait = A.iterator();
+	  Iterator Bit = B.iterator();
 	  
-	  for(int i =0; i < A.getCapacity(); i++){
-		  
+	  while(Ait.hasNext()){
+		  sum = sum + Ait.next()*Bit.next();
 	  }
 	  
-	  return sum;
+	  return sum; 
+  }
+  
+  public static double vectorMag(ColorTable A){
+	  double sum = 0;
 	  
+	  for(int i = 0; i < A.getCapacity(); i++){
+		  sum = sum + A.getCountAt(i) * A.getCountAt(i);
+	  }
+	  
+	  return Math.sqrt(sum); 
   }
   
   
   public static double cosineSimilarity(ColorTable A, ColorTable B) {
 	  
-    return 1.0;
+    return dotProd(A, B)/(vectorMag(A)*vectorMag(B));
   }
  
   /**

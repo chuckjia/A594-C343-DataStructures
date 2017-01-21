@@ -1,11 +1,12 @@
 /**
  * TODO
- * @author (your name goes here)
+ * @ Chuck Jia (your name goes here)
  */
 
 public class Driver {
   
   private static int numCollisions;
+  private static double rehashThreshold = 0.49;
   
   /**
    * TODO
@@ -14,7 +15,16 @@ public class Driver {
    * is restricted to bitsPerChannel. Increment numCollisions after each increment.
    */
   public static ColorTable vectorize(Image image, int bitsPerChannel) {
-    return null;
+	  int w = image.getWidth();
+	  int h = image.getHeight();
+	  ColorTable table = new ColorTable(3, bitsPerChannel, Constants.QUADRATIC, rehashThreshold);
+	  
+	  for(int i = 0; i < w; i++){
+		  for(int j = 0; j < h; j++){
+			  table.increment(image.getColor(i, j));
+		  }
+	  }
+	  return table;
   }
 
   /**
@@ -25,7 +35,10 @@ public class Driver {
    * Note: If you compute the similarity of an image with itself, it should be close to 1.0.
    */
   public static double similarity(Image image1, Image image2, int bitsPerChannel) {
-    return 1.0;
+	  ColorTable A = vectorize(image1, bitsPerChannel);
+	  ColorTable B = vectorize(image2, bitsPerChannel);
+	
+      return Util.cosineSimilarity(A, B);
   }
 
   /**

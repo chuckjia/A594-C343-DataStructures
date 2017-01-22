@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 /**
  * TODO
  * @ Chuck Jia
@@ -7,6 +9,7 @@ public class Driver {
   
   private static int numCollisions;
   private static double rehashThreshold = 0.49;
+  private static int collisionStrategy = Constants.LINEAR;
   
   /**
    * TODO
@@ -17,7 +20,7 @@ public class Driver {
   public static ColorTable vectorize(Image image, int bitsPerChannel) {
 	  int w = image.getWidth();
 	  int h = image.getHeight();
-	  ColorTable table = new ColorTable(3, bitsPerChannel, Constants.QUADRATIC, rehashThreshold);
+	  ColorTable table = new ColorTable(3, bitsPerChannel, collisionStrategy, rehashThreshold);
 
 	  for(int i = 0; i < w; i++){
 		  for(int j = 0; j < h; j++){
@@ -80,6 +83,61 @@ public class Driver {
         starry.getWidth() + " x " + starry.getHeight());
     System.out.println("christina's dimensions are " + 
         christina.getWidth() + " x " + christina.getHeight());
+    
+    System.out.println("");
+    // Calculating the number of black pixels 
+    ColorTable tableMona = vectorize(mona,2);
+    ColorTable tableStarry = vectorize(starry,2);    
+    System.out.println("Count of black pixels in Davinci's Mona Lisa using " + tableMona.getBitsPerChannel() + " bits per channel is: " + tableMona.get(Color.BLACK));
+    System.out.println("Count of black pixels in Van Gogh's Starry Night using " + tableMona.getBitsPerChannel() + " bits per channel is: " + tableStarry.get(Color.BLACK));
+    System.out.println("");
+    
     // allPairsTest();
+    
+    class ImageArrElem{
+    	public String name;
+    	public Image image;
+    	
+    	ImageArrElem(String name, Image image){
+    		this.name = name;
+    		this.image = image;
+    	}
+    }
+    
+    ImageArrElem[] imageArr = new ImageArrElem[9];
+    String[] imageNames = {"cezanne", "davinci", "degas", "homer", "kahlo", "picasso", "renoir", "vangogh", "wyeth"};
+    
+    for(int i = 0; i < 9; i++){
+    	Image tempImage = new Image(Constants.IMAGE_DIR + "/" + imageNames[i] + ".jpg");
+        imageArr[i] = new ImageArrElem(imageNames[i], tempImage);
+    } 
+    
+    /* Testing
+     * 
+      for(int i = 0; i < 9; i++){
+    	  System.out.println(i + ". " + imageArr[i].name + ": " + imageArr[i].image.getWidth() + "x" + imageArr[i].image.getHeight());
+      }
+    */
+	
+    int thisBitsPerChannel = 4;
+    int count = 0;
+    double max = 0;
+    int maxi = 0;
+    int maxj = 0;
+    
+    for(int i = 0; i <= 7; i++){
+    	for(int j = i + 1; j <= 8; j++){
+    		double temp = similarity(imageArr[i].image, imageArr[j].image, thisBitsPerChannel);
+    		count++;
+    		if(temp > max){
+    			max = temp;
+    			maxi = i;
+    			maxj = j;
+    		}
+    		System.out.println(count + ". " + "Similarity between " + imageArr[i].name + " and " + imageArr[j].name + " is " + temp);
+    	}
+    }
+    System.out.println("The most similar pair is " + imageArr[maxi].name + " and " + imageArr[maxj].name + " with similarity " + max);
+    
   }
 }

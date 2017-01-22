@@ -54,7 +54,9 @@ public class ColorTable{
   private int collisionStrategy;
   private double rehashThreshold;
   
+  
   public ColorTable(int initialCapacity, int bitsPerChannel, int collisionStrategy, double rehashThreshold) {
+	  // Throw exceptions if any of the arguments are out of range
 	  if( !(initialCapacity >= 1 && initialCapacity <= Constants.MAX_CAPACITY) )
 		  throw new RuntimeException("Invalid value for starting capacity!");
 	  if( !(bitsPerChannel >= 1 && bitsPerChannel <= 8) )
@@ -71,6 +73,7 @@ public class ColorTable{
 	  this.collisionStrategy = collisionStrategy;
 	  this.rehashThreshold = rehashThreshold; 
   }
+  
 
   /**
    * TODO
@@ -82,22 +85,31 @@ public class ColorTable{
 	  return this.bitsPerChannel;
   }
 
+  /* Helper Method
+   * "lookup" returns the index of color in table, or if the color is not in table, returns the 
+   * index where color can be correctly put in table. 
+   * Two arguments color and table are used due to usage in "rehash".
+   */
   
-  public int lookup(Color color, TableElem[] table){	  
+  public int lookup(Color color, TableElem[] table){ 
 	  int colorkey = Util.pack(color, bitsPerChannel);
 	  int start = colorkey % table.length;
 	  int i = start;
 	  int k = 0;
-			
+	  numCollisions = 0;
+
 	  while(table[i] != null && table[i].key != colorkey){
 		  k++;
+
 		  if(collisionStrategy == Constants.LINEAR){
 			  i = (start + k) % table.length;
-		  }else{
+		  }else{ // This is the case of quadratic probing. 
 			  i = (start + k*k) % table.length;
 		  }
+
+		  numCollisions++; // Count the number of collisions
 	  }
-		
+
 	  return i; 
   }
   
@@ -110,7 +122,6 @@ public class ColorTable{
    * count of zero. Uses Util.pack() as the hash function.
    */
   
-  
   public long get(Color color) {
 	  int i = lookup(color, table);
 	  
@@ -119,6 +130,7 @@ public class ColorTable{
 
 	  return table[i].value;  
   }
+  
 
   /**
    * TODO
@@ -126,16 +138,18 @@ public class ColorTable{
    * Associates the count with the color in this table. Do nothing if count is less than
    * or equal to zero. Uses Util.pack() as the hash function.
    */
+  
   public void put(Color color, long count) {	  
-	  if(count > 0){
+	  if(count > 0){ // Do nothing if count is not positive
 		  int i = lookup(color, table);
-		  if(table[i] == null){  // Questions? What to do if color is not originally in
+		  if(table[i] == null){ // If color is not yet in table
 			  table[i] = new TableElem(Util.pack(color, bitsPerChannel), count);
 		  }else{
 			  table[i].value = count;
 		  }
 	  }
-
+      
+	  // The length of table changed. Rehash if needed.
 	  if(getLoadFactor() >= rehashThreshold){
 		  rehash();
 	  }
@@ -148,15 +162,17 @@ public class ColorTable{
    * explicitly represented in the table are assumed to be present with a
    * count of zero.
    */
+  
   public void increment(Color color) {
 	  int i = lookup(color, table);
 
-	  if(table[i] == null){
+	  if(table[i] == null){ //If color is not table, then add it to table
 		  table[i] = new TableElem(Util.pack(color, bitsPerChannel), 1);
 	  }else{
 		  table[i].value++; 
 	  }
 
+	  // The length of table changed. Rehash if needed.
 	  if(getLoadFactor() >= rehashThreshold){
 		  rehash();
 	  }
@@ -178,6 +194,7 @@ public class ColorTable{
    * 
    * Returns the size of the internal array representing this table.
    */
+  
   public int getCapacity() {
 	  return table.length;
   }
@@ -187,6 +204,7 @@ public class ColorTable{
    * 
    * Returns the number of key/value associations in this table.
    */
+  
   public int getSize() {
 	  int n = 0;
 	  for(int i = 0; i < table.length; i++){
@@ -196,13 +214,16 @@ public class ColorTable{
 	  return n;
   }
 
+  
   /**
    * TODO
    * 
    * Returns true iff this table is empty.
    */
+  
   public boolean isEmpty() {
 	  boolean result = true;
+	  
 	  if(getSize() > 0)
 		  result = false;
 	  return result;
@@ -223,24 +244,29 @@ public class ColorTable{
    * 
    * @throws RuntimeException if the table is already at maximum capacity.
    */
+  
   private void rehash() { 
-	  int tableLength = getCapacity();
-	  double tableElemNum = getSize();
+	  int tableLength = getCapacity(); // The length of table
+	  double tableElemNum = getSize(); // The number of key/value associations in table
 	  int j = 2 * tableLength + 1;
-
+      
+	  // In the following while loop, we make sure that a number j is found that satisfies all the conditions
+	  // (1) j is prime, (2) j%4==3, (3) new size j makes load less than the rehash threshold
 	  while( ( !(Util.isPrime(j) && (j % 4 == 3) && (tableElemNum/j < rehashThreshold)) ) && j <= Constants.MAX_CAPACITY){
-		  j += 2; // Only need to traverse all odd numbers
+		  j += 2; // Only need to traverse odd numbers
 	  }
 	  
-	  if(j == Constants.MAX_CAPACITY)
+	  // Throw exception if the j we found is too large
+	  // If in the while loop j reaches MAX_CAPACITY (and thus stops the loop), we consider it to be too large
+	  if(j >= Constants.MAX_CAPACITY)
 		  throw new RuntimeException("Hash table size is too large!");
 		  
 	  TableElem[] newTable = new TableElem[j];
 
 	  for(int i = 0; i < tableLength; i++){
-		  if(table[i] != null){
+		  if(table[i] != null){ // Traverse all key/value associations in table
 			  int k = lookup(Util.unpack(table[i].key, bitsPerChannel), newTable);
-			  if(newTable[k] == null){ // for robustness, might have problems later
+			  if(newTable[k] == null){
 				  newTable[k] = new TableElem(table[i].key, table[i].value);
 			  }
 		  }
@@ -261,6 +287,7 @@ public class ColorTable{
 		  private int r = 0;
 		  private int g = 0;
 		  private int b = 0;
+		  // From one color to the next, the increment is 2 to the power of 8-bitsPerChannel
 		  private int inc = (int) Math.pow(2, 8 - bitsPerChannel);
 
 		  public boolean hasNext(){
@@ -296,6 +323,7 @@ public class ColorTable{
    * 
    * Returns a String representation of this table.
    */
+  
   public String toString() {
 	  String tableString = ""; 
 	  for(int i = 0; i < table.length; i++){
@@ -304,7 +332,7 @@ public class ColorTable{
 		  }
 	  }
 	  
-	  // The following is for the purpose of deleting the last ";"
+	  // The following is to delete the last ";" in the final string
 	  if(tableString != null && tableString.substring(tableString.length()-2).equals("; "))
 		  tableString = tableString.substring(0, tableString.length()-2);
 
@@ -317,6 +345,7 @@ public class ColorTable{
    * Returns the count in the table at index i in the array representing the table.
    * The sole purpose of this function is to aid in writing the unit tests.
    */
+  
   public long getCountAt(int i) { 
 	  if(table[i] == null){
 		  return 0;
@@ -327,6 +356,7 @@ public class ColorTable{
   /**
    * Simple testing.
    */
+  
   public static void main(String[] args) {
 	  ColorTable table = new ColorTable(3, 6, Constants.QUADRATIC, .49);
 

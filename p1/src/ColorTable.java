@@ -23,7 +23,7 @@ public class ColorTable{
    * Counts the number of collisions during an operation.
    */
   private static int numCollisions = 0;
-
+  
   /**
    * Returns the number of collisions that occurred during the most recent get or
    * put operation.
@@ -96,7 +96,6 @@ public class ColorTable{
 	  int start = colorkey % table.length;
 	  int i = start;
 	  int k = 0;
-	  numCollisions = 0;
 
 	  while(table[i] != null && table[i].key != colorkey){
 		  k++;
@@ -107,7 +106,7 @@ public class ColorTable{
 			  i = (start + k*k) % table.length;
 		  }
 
-		  numCollisions++; // Count the number of collisions
+		  numCollisions++; // Count the number of collisions in most recent operation
 	  }
 
 	  return i; 
@@ -123,6 +122,7 @@ public class ColorTable{
    */
   
   public long get(Color color) {
+	  numCollisions = 0;
 	  int i = lookup(color, table);
 	  
 	  if(table[i] == null)
@@ -139,7 +139,8 @@ public class ColorTable{
    * or equal to zero. Uses Util.pack() as the hash function.
    */
   
-  public void put(Color color, long count) {	  
+  public void put(Color color, long count) {
+	  numCollisions = 0;
 	  if(count > 0){ // Do nothing if count is not positive
 		  int i = lookup(color, table);
 		  if(table[i] == null){ // If color is not yet in table
@@ -164,6 +165,7 @@ public class ColorTable{
    */
   
   public void increment(Color color) {
+	  numCollisions = 0;
 	  int i = lookup(color, table);
 
 	  if(table[i] == null){ //If color is not table, then add it to table

@@ -1,0 +1,38 @@
+Name: Chuck Jia
+Username: jiac
+Lab Section: Lab F
+
+1. Approach to implementing the hash table in side ColorTable
+
+	My hash table is designed as an array of objects. The object type is defined in the TableElem class and consists of two variables: key and value, representing the key and frequency count for a certain color. 
+
+	I chose to use just one array with objects representing the key/value pairs, instead of two separate arrays because the former approach better represents the association of key and value. By using just one array instead of two, we can avoid having to create elements or change values TWICE and having to make sure keys are always associated with correct values. This results in easier-to-read code and reduces the chance of making mistakes in programming. (From storage/computation perspectives, these two methods should be similar in effciency. Thus, I chose the more programming friendly approach.)
+
+
+2. Helper methods I used
+
+	lookup(Color color, TableElem[] table)
+	
+	The method lookup searches for the index of the given color in the array table. If color exists in table, then lookup returns the index of color in table. If color does not exists in table, then lookup returns the index where color can be correctly added to table.
+	The reason why I created lookup is that the operation of searching for color is used several places in the program. For example, it is used in the methods get, put, increment, and rehash. The reason why lookup was designed to have the second argument "table" is because lookup is used in the method rehash where operations are conducted on a newly created array (that is not the original table defined in the ColorTable class).
+		
+
+3. If 2 bits per channel is used, there are 
+	42831 black pixels in Davinci's Mona Lisa image, and 
+	42127 black pixels in Van Gogh's Starry Night image
+	
+	
+4. The most similar images (at 4 bits per channel) are degas and vangogh, with similarity 0.6912175630481844.
+	For those two images, the collision numbers are
+	(1) 14619, with linear collision strategy, and 
+	(2) 5902, with quadratic collision strategy
+	
+
+5. By completing this project, I learned how to implement a hashtable in java, along with the common operations on hashtables, e.g. putting elements into a hashtable, getting information from a hashtable, and rehashing a hashtable, etc. Also, I learned more about object oriented programming. In particular, I got more experience with interfaces in Java.
+
+
+
+
+
+
+

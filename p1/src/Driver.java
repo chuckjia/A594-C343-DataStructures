@@ -2,7 +2,7 @@ import java.awt.Color;
 
 /**
  * TODO
- * @ Chuck Jia
+ * @ Author: Chuck Jia
  */
 
 public class Driver {
@@ -21,12 +21,14 @@ public class Driver {
 	  int w = image.getWidth();
 	  int h = image.getHeight();
 	  ColorTable table = new ColorTable(3, bitsPerChannel, collisionStrategy, rehashThreshold);
-
+      
+	  numCollisions = 0;
 	  for(int i = 0; i < w; i++){
 		  for(int j = 0; j < h; j++){
 			  table.increment(image.getColor(i, j));
+			  numCollisions += table.getNumCollisions();
 		  }
-	  }
+	  } 
 	  return table;
   }
 
@@ -38,9 +40,12 @@ public class Driver {
    * Note: If you compute the similarity of an image with itself, it should be close to 1.0.
    */
   public static double similarity(Image image1, Image image2, int bitsPerChannel) {
-	  ColorTable A = vectorize(image1, bitsPerChannel);
+	  int temp;
+	  ColorTable A = vectorize(image1, bitsPerChannel);	 
+	  temp = numCollisions;
 	  ColorTable B = vectorize(image2, bitsPerChannel);
-
+	  numCollisions += temp;
+	  
 	  return Util.cosineSimilarity(A, B);
   }
 
@@ -92,6 +97,7 @@ public class Driver {
     System.out.println("Count of black pixels in Van Gogh's Starry Night using " + tableMona.getBitsPerChannel() + " bits per channel is: " + tableStarry.get(Color.BLACK));
     System.out.println("");
     
+    
     // allPairsTest();
     
     class ImageArrElem{
@@ -107,7 +113,7 @@ public class Driver {
     ImageArrElem[] imageArr = new ImageArrElem[9];
     String[] imageNames = {"cezanne", "davinci", "degas", "homer", "kahlo", "picasso", "renoir", "vangogh", "wyeth"};
     
-    for(int i = 0; i < 9; i++){
+    for(int i = 0; i < 9; i++){ // Importing file names and associated images to imageArr
     	Image tempImage = new Image(Constants.IMAGE_DIR + "/" + imageNames[i] + ".jpg");
         imageArr[i] = new ImageArrElem(imageNames[i], tempImage);
     } 
@@ -120,7 +126,7 @@ public class Driver {
     */
 	
     int thisBitsPerChannel = 4;
-    int count = 0;
+    int count = 0, maxcount = 0;
     double max = 0;
     int maxi = 0;
     int maxj = 0;
@@ -128,16 +134,18 @@ public class Driver {
     for(int i = 0; i <= 7; i++){
     	for(int j = i + 1; j <= 8; j++){
     		double temp = similarity(imageArr[i].image, imageArr[j].image, thisBitsPerChannel);
+    		int collisionCount = numCollisions;
     		count++;
     		if(temp > max){
     			max = temp;
     			maxi = i;
     			maxj = j;
+    			maxcount = count;
     		}
-    		System.out.println(count + ". " + "Similarity between " + imageArr[i].name + " and " + imageArr[j].name + " is " + temp);
+    		System.out.println(count + ". " + "Similarity between " + imageArr[i].name + " and " + imageArr[j].name + " is " + temp + " Collision number: " + collisionCount);
     	}
     }
-    System.out.println("The most similar pair is " + imageArr[maxi].name + " and " + imageArr[maxj].name + " with similarity " + max);
+    System.out.println("\nThe most similar pair is " + maxcount + ". "+ imageArr[maxi].name + " and " + imageArr[maxj].name + " with similarity " + max);
     
   }
 }

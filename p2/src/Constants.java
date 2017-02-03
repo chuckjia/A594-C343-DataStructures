@@ -11,6 +11,6 @@ public class Constants {
   public static final int MAX_DIM = 101;
   public static final String TEST_GRAPH = "results.png";
   
-  public static final int DEFAULT_SIZE = 20;
+  public static final int DEFAULT_SIZE = 14;
 }
 

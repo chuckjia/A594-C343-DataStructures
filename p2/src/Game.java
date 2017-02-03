@@ -120,7 +120,7 @@ public class Game {
    */
   
   public void undomove(){ // For testing CJ
-	  board.unflood(board.prevColor);
+	  board.unflood(board.getPrevColor());
 	  currentStep--;
 	  theView.setSteps();
 	  theView.repaint();

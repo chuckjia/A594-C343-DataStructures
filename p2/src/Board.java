@@ -17,7 +17,7 @@ public class Board {
   private Map<Coord, Tile> inside, outside;
   private Map<Coord, Tile> newinside;  // For undo move
   private int size;
-  public WaterColor prevColor; // For undo move
+  private WaterColor prevColor; // For undo move
   private Map<WaterColor, Integer> colorCounts = new HashMap<>(); // For suggestion
   
   /**
@@ -96,15 +96,8 @@ public class Board {
 	  return false;
   }
   
-  /**
-   * TODO
-   * 
-   * Updates this board by changing the color of the current flood region 
-   * and extending its reach.
-   */
-  
-  public void flood(WaterColor color) {
-	  flood1(color);
+  public WaterColor getPrevColor(){ // For undo move
+	  return prevColor;
   }
   
   public void unflood(WaterColor color){ // For undo move
@@ -119,6 +112,17 @@ public class Board {
   /**
    * TODO
    * 
+   * Updates this board by changing the color of the current flood region 
+   * and extending its reach.
+   */
+  
+  public void flood(WaterColor color) {
+	  flood1(color);
+  }
+
+  /**
+   * TODO
+   * 
    * Explore a variety of algorithms for handling a flood. Use the same interface 
    * as for flood above, but add an index so your methods are named flood1,
    * flood2, ..., and so on. Then, use the batchTest() tool in Driver to run game
@@ -127,8 +131,10 @@ public class Board {
    * flood, including the one above that you eventually settle on, write a comment
    * that describes your algorithm in English. For those implementations that you
    * abandon, state your reasons. 
-   * 
-   * 
+   *    
+   */
+  
+  /*
    * My algorithm for flood1:
    * 
    * Each time flood1() is called, I start to check from the ORIGIN point. If the 
@@ -141,31 +147,20 @@ public class Board {
    * previous 2 cases, then just return (void).
    * 
    * During this process, I keeped a hashmap "visited" to keep track of which tiles 
-   * have been visited, so that next time I do not need to repeat the checkings.
+   * have been visited, so that next time I do not need to repeat the checks.
    * 
-   * Also, I added another hashmap newinside, which keeps track of the tiles that are 
+   * Added feature to the game: "undo move"
+   * I added another hashmap "newinside", which keeps track of the tiles that are 
    * newly added to inside from the last step. In this way, with the function
-   *  unflood(), I was able to add the feature "undo move" to our game. Just clicking  
+   * unflood(), I was able to add the feature "undo move" to our game. Just clicking  
    * Game -> Undo move in the menu would undo the last move.
    * 
-   * 
-   * 
-   * Why I choose flood1 instead of flood2:
-   * 
-   * The earlier version flood2 would flood the area first by only checking the colors
-   * of the tiles, in a second step, resweep the flooded area and update inside. The
-   * complexities of flood2 and flood1 are similar. But, by combining the color change
-   * and updating "inside" in just ONE sweep, some running time has been saved. 
-   * For example, in flood2, for each tile, (roughly speaking) we calculate its 
-   * neighbor coordinates TWICE, while in flood1, we only need to do ONCE. Therefore, 
-   * flood1 is more efficient than flood2. Thus, I kept this version of flood.
-   *    
-   */
+   * */
   
   public void flood1(WaterColor color) {
 	  HashSet<Coord> visited = new HashSet<>();
 	  newinside.clear(); // For undo move
-	  prevColor = get(Coord.ORIGIN).getColor();
+	  prevColor = get(Coord.ORIGIN).getColor(); // For undo move
 	  floodNeighbor(Coord.ORIGIN, color, visited);
   }
   
@@ -184,14 +179,25 @@ public class Board {
 	  }
 	  
 	  List<Coord> nb = coord.neighbors(size);
-	  for (int i = 0; i < 4; i++){
-		  Coord p = nb.get(i);
+	  for (Coord p : nb){
 		  if (p != null && !visited.contains(p)){
 			  floodNeighbor(p, newColor, visited);
 		  }
 	  }
   }
   
+  /*
+  * Why I choose flood1 instead of flood2:
+  * 
+  * The earlier version flood2 would flood the area first by ONLY checking the colors
+  * of the tiles, in a second step, resweep the flooded area and update inside. The
+  * complexities of flood2 and flood1 are similar. But, by combining the color change
+  * and updating "inside" in just ONE sweep, some running time has been saved. 
+  * For example, in flood2, for each tile, (roughly speaking) we calculate its 
+  * neighbor coordinates TWICE, while in flood1, we only need to do ONCE. Therefore, 
+  * flood1 is more efficient than flood2. Thus, I kept this version of flood.
+  * 
+  * */
   
   public void flood2(WaterColor color) {
 	  HashSet<Coord> visited = new HashSet<>();
@@ -238,6 +244,60 @@ public class Board {
 		  }
 	  }
   }
+  
+  /*
+   * Flood3: Non-recursive method
+   * 
+   * Why I choose flood1 instead of flood3:
+   * Flood3() is a NON-recursive method. To update the set "inside", I keep sweeping "inside" 
+   * and for each of the tiles, I check if any of its neighbors should be updated to "inside". 
+   * But in order to efficiently update the set "inside", I had to keep a new hashset "ninside"
+   * to track the one I just added to "inside". This way, next time I sweep, I do not need to 
+   * sweep the whole "inside" set, and instead I just need to sweep the "ninside" part.
+   * 
+   * Although the running time should be comparable to flood1(), I feel that the "ninside" set
+   * is an extra cost on storage. Also, the recursive algorithm of flood1 is much simpler to 
+   * write. Thus, I decided to use flood1 instead of flood3.
+   * 
+   * Note: this method flood3 has not been updated to work with the "undo move" feature.
+   * 
+   * */
+  
+  public void flood3(WaterColor color) {
+	  for (Coord k : inside.keySet()){
+		  get(k).setColor(color);
+	  }
+	  HashSet<Coord> ninside = new HashSet<>();
+	  for (Coord k : inside.keySet()){
+		  ninside.add(k);
+	  }	  
+	  
+	  while(ninside.size() != 0)
+		  ninside = flood3Helper(color, ninside);
+  }
+  
+  // flood3 helper: Updating the inside set
+  public HashSet<Coord> flood3Helper(WaterColor currColor, HashSet<Coord> ninside){
+	  HashSet<Coord> ninsidetemp = new HashSet<>();
+	  for (Coord k : ninside){
+		  ninsidetemp.add(k);
+	  }
+	  for (Coord k : ninsidetemp){
+		  ninside.remove(k);
+		  List<Coord> nb = k.neighbors(size);
+		  for (Coord p : nb){
+			  if (p != null && !inside.containsKey(p) ){
+				  if (get(p).getColor() == currColor){
+					  inside.put(p, get(p));
+					  outside.remove(p);
+					  ninside.add(p);
+				  } 					  
+			  }
+		  }
+	  }
+	  return ninside; 
+  }
+
   
   
   /**
@@ -306,6 +366,22 @@ public class Board {
       ans.append("\n");
     }
     return ans.toString();
+  }
+  
+  
+  public void testSetFull(){ // For testing fullyFlooded
+	  for( Coord p : outside.keySet() ){
+		  get(p).setColor(WaterColor.BLUE);
+		  inside.put(p, get(p));
+	  }
+	  outside.clear();
+  }
+  
+  public void testMyBoard1(){
+	  for( Coord p : inside.keySet() )
+		  get(p).setColor(WaterColor.BLUE);
+	  for( Coord p : outside.keySet() )
+		  get(p).setColor(WaterColor.RED);	  
   }
   
   /**

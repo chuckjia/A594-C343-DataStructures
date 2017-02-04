@@ -32,7 +32,7 @@ public class Game {
     SwingUtilities.invokeLater(() -> new Game());
     
     // Uncomment the following line to run a batch of games and display a graph of the timings:
-     new Game(false).batchTest();
+    // new Game(false).batchTest();
   }
 
   /**

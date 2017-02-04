@@ -137,14 +137,15 @@ public class Board {
   /*
    * My algorithm for flood1:
    * 
-   * Each time flood1() is called, I start to check from the ORIGIN point. If the 
-   * origin point is in "inside", then its 4 neighbors will be checked one by one. 
-   * For each one of neighbors, there are 3 possibilities: (1) If it is in the 
-   * hashmap "inside", then it will be set to the new color, and then we repeat the
-   * procedures on its 4 neighbors; (2) If it is not in the inside, but has the same
-   * color with the new color, then it will be added to "inside" and removed from 
-   * "outside", and then we repeat the procedures on its 4 neighbors; (3) if not the
-   * previous 2 cases, then just return (void).
+   * Flood1() is a recursive method.
+   * 
+   * Each time flood1() is called, I start to check from the tile ORIGIN. 
+   * (1) If the tile is in "inside", then it will be set to the new color, and 
+   * then we repeat the procedures on its 4 neighbors; 
+   * (2) If it is not in the inside, but has the same color with the new color, 
+   * then it will be added to "inside" and removed from "outside", and then we 
+   * repeat the procedures on its 4 neighbors; 
+   * (3) if not the previous 2 cases, then just return (void).
    * 
    * During this process, I keeped a hashmap "visited" to keep track of which tiles 
    * have been visited, so that next time I do not need to repeat the checks.
@@ -152,8 +153,8 @@ public class Board {
    * Added feature to the game: "undo move"
    * I added another hashmap "newinside", which keeps track of the tiles that are 
    * newly added to inside from the last step. In this way, with the function
-   * unflood(), I was able to add the feature "undo move" to our game. Just clicking  
-   * Game -> Undo move in the menu would undo the last move.
+   * unflood(), I was able to add the feature "undo move" to our game. Simply clicking  
+   * "Game -> Undo move" in the menu would undo the last move.
    * 
    * */
   
@@ -195,7 +196,7 @@ public class Board {
   * and updating "inside" in just ONE sweep, some running time has been saved. 
   * For example, in flood2, for each tile, (roughly speaking) we calculate its 
   * neighbor coordinates TWICE, while in flood1, we only need to do ONCE. Therefore, 
-  * flood1 is more efficient than flood2. Thus, I kept this version of flood.
+  * flood1 is more efficient than flood2. Thus, I chose to use flood1.
   * 
   * */
   
@@ -312,12 +313,19 @@ public class Board {
    * 
    * My algorithm for suggest:
    * 
+   * IDEA: The method sugguest() counts the number of tiles of each color that are adjacent to 
+   * the flooded area and gives the suggestion of the color with the most count.
    * 
-   * 
-   * 
+   * This is a recursive method. I start from the tile ORIGIN. 
+   * (1) If the tile is in "inside", then I repeat the procedures on its neighbors
+   * (2) If the tile is not in "inside", then I note its color and increment this color's
+   *    count (stored in colorCounts).
+   * Again, a hashset "visited" is used to keep the process efficient.
+   *  
+   * A recursive helper function countNeighbor is used here.
    */
   
-  
+  // Helper function for suggest()
   private void countNeighbor( Coord coord, WaterColor colortry, HashSet<Coord> visited ){
 	  visited.add(coord);
 	  if ( !inside.containsKey(coord) ) {
@@ -330,8 +338,7 @@ public class Board {
 	  }
 	  
 	  List<Coord> nb = coord.neighbors(size);
-	  for (int i = 0; i < 4; i++){
-		  Coord p = nb.get(i);
+	  for (Coord p : nb){
 		  if (p != null && !visited.contains(p)){
 			  countNeighbor(p, colortry, visited);
 		  }
@@ -349,6 +356,7 @@ public class Board {
 	  
 	  return nextColor();
   }
+  
   
   /**
    * Returns a string representation of this board. Tiles are given as their
@@ -369,6 +377,8 @@ public class Board {
   }
   
   
+  // Following are some methods to provide instances of board for testing  
+  
   public void testSetFull(){ // For testing fullyFlooded
 	  for( Coord p : outside.keySet() ){
 		  get(p).setColor(WaterColor.BLUE);
@@ -377,12 +387,37 @@ public class Board {
 	  outside.clear();
   }
   
-  public void testMyBoard1(){
+  public void testMyBoard1(){ // For testing. Build an instance of a board
 	  for( Coord p : inside.keySet() )
 		  get(p).setColor(WaterColor.BLUE);
 	  for( Coord p : outside.keySet() )
 		  get(p).setColor(WaterColor.RED);	  
   }
+  
+ 
+  public void testMyBoard2(){ // For testing. Build an instance of a board
+	  for (Coord p : outside.keySet())
+		  get(p).setColor(WaterColor.BLUE);
+	  for( Coord p : inside.keySet() ){
+		  get(p).setColor(WaterColor.BLUE);
+		  outside.put(p, get(p));
+	  }
+	  inside.clear();
+	  
+	  get(Coord.ORIGIN).setColor(WaterColor.CYAN);
+	  inside.put(Coord.ORIGIN, get(Coord.ORIGIN));
+	  outside.remove(Coord.ORIGIN);	  
+
+	  int bsize = getSize();
+	  for( int i = 0; i < bsize; i++){
+		  Coord coord = new Coord(i, bsize - 1);
+		  Coord coord2 = new Coord(bsize - 1, i);
+		  get(coord).setColor(WaterColor.YELLOW);
+		  get(coord2).setColor(WaterColor.RED);
+	  }
+
+  }
+  
   
   /**
    * Simple testing.

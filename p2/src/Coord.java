@@ -156,7 +156,7 @@ public class Coord implements Comparable<Coord> {
    * as uniformly distributed among the range of integers as possible.
    */
   public int hashCode() {
-	  return x << 15 - x + y; // B/c Integer.MAX_VALUE = 2^31-1
+	  return (x << 15) - x + y; // Because Integer.MAX_VALUE = 2^31-1
   }
 
   /**

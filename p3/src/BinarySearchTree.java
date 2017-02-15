@@ -111,7 +111,7 @@ public class BinarySearchTree<K> implements Tree<K> {
     public Node getBefore() {
     	Node p = getBeforeHelper(this); // Assume p is not null
     	while (p != null && p.dirty)
-    		p = getBeforeHelper(this);    		
+    		p = getBeforeHelper(p);    		
     	return p;
     }
 

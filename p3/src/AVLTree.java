@@ -28,29 +28,41 @@ public class AVLTree<K> extends BinarySearchTree<K> {
   
   public Node insert(K key) {
     Node p = super.insert(key);
-    //Node q = findPivotES(p);
+    Node q = findPivotES(p);
     
-    // Case 1: Whole tree is not overweight/no pivots
-    //if (q == null) 
-    	//return p;
+    // Whole tree is not overweight/no pivots
+    if (q == null) 
+    	return p;
     
-    // Case 2: LL
-    
-    
-    
+    do{
+    	// Rotations
+    	if (q.balFactor() < 0){ // L
+    		if (q.left.balFactor() < 0) // LL
+    			q = rotateLL(q);
+    		else
+    			q = rotateLR(q); // LR
+    	} else { // R
+    		if (q.right.balFactor() > 0)
+    			q = rotateRR(q); // RR
+    		else
+    			q = rotateRL(q); // RL
+    	}
+    	q = findPivot(q);
+    } while (q != null);
     
     return p;
-    
   }
   
   // Find overweight nodes with early stop
   // @return null if no one found, i.e. the tree is not overweight
   
   private Node findPivotES(Node p){ 
+	  p = p.parent;
 	  while (p != null && !p.isOverWeight()){
-		  if (p.left.height == p.right.height)
+		  if (p.balFactor() == 0)
 			  return null;
 		  p = p.parent;
+		  // No need to fix heights, as they are fixed in BST.insert
 	  }
 	  if (p == null)
 		  return null;
@@ -60,24 +72,186 @@ public class AVLTree<K> extends BinarySearchTree<K> {
   // Find overweight nodes
   // @return null if no one found, i.e. the tree is not overweight
   private Node findPivot(Node p){
-	  while (p != null && !p.isOverWeight())
+	  p = p.parent;
+	  while (p != null && !p.isOverWeight()){
+		  p.fixHeight();
 		  p = p.parent;
+	  }
 	  
 	  if (p == null)
 		  return null;
 	  return p;
   }
   
-  private Node ll(Node k1){
+  private Node rotateLL(Node k1){
 	  Node k2 = k1.left;
-	  Node b = k1.right;
-	  if (k1.parent == null){
-		  // Modify k2
+	  Node b = k2.right;
+
+	  // Attach k2 and its parent 
+	  if (k1.parent == null){ // Case 1: k1 is root
+		  root = k2;
+		  k2.parent = null;		  
+	  } else { // Case 2: k1 is not root	
+		  Node k0 = k1.parent;
+		  if (k0.left == k1)
+			  k0.left = k2;
+		  else
+			  k0.right = k2;
+
+		  k2.parent = k0;
+	  }
+	  
+	  // Modify k2's children
+	  k2.right = k1;
+
+	  // Modify k1
+	  k1.parent = k2;
+	  k1.left = b;
+
+	  // Modify b
+	  if (b != null)
+		  b.parent = k1;
+
+	  k1.fixHeight();
+	  k2.fixHeight();
+	  return k2;
+  }
+  
+  
+  private Node rotateRR(Node k1){
+	  Node k2 = k1.right;
+	  Node b = k2.left;
+	  
+	  // Attach k2 and its parent
+	  if (k1.parent == null){ // Case 1: k1 is root
 		  root = k2;
 		  k2.parent = null;
+	  } else { // Case 2: k1 is not root
+		  Node k0 = k1.parent;
+		  if (k0.left == k1)
+			  k0.left = k2;
+		  else
+			  k0.right = k2;
+		  
+		  k2.parent = k0;
 	  }
-	  return null;
+	  
+	  // Modify k2's children	  
+	  k2.left = k1;
+
+	  // Modify k1
+	  k1.right = b;
+	  k1.parent = k2;
+
+	  // Modify b
+	  if (b != null)
+		  b.parent = k1;
+
+	  k1.fixHeight();
+	  k2.fixHeight();
+	  return k2;
   }
+  
+  
+  private Node rotateLR(Node k1){
+	  Node k2 = k1.left;
+	  Node k3 = k2.right;
+	  Node b = k3.left;
+	  Node c = k3.right;
+
+	  // Attach k3 and its parent
+	  if (k1.parent == null){ // Case 1: k1 is root
+		  root = k3;
+		  k3.parent = null;
+	  } else { // Case 2: k1 is not root
+		  // Modify k3's parent
+		  Node k0 = k1.parent;
+		  if (k0.left == k1)
+			  k0.left = k3;
+		  else
+			  k0.right = k3;
+		  
+		  k3.parent = k0;
+	  }
+	  
+	  // Modify k3's children
+	  k3.left = k2;
+	  k3.right = k1;
+
+	  // Modify k2
+	  k2.right = b;
+	  k2.parent = k3;
+
+	  // Modify k1
+	  k1.left = c;
+	  k1.parent = k3;
+
+	  // Modify b
+	  if (b != null)
+		  b.parent = k2;
+
+	  // Modify c
+	  if (c != null)
+		  c.parent = k1;
+	  
+	  k1.fixHeight();
+	  k2.fixHeight();
+	  k3.fixHeight();
+	  
+	  return k3;
+  }
+  
+  
+  private Node rotateRL(Node k1){
+	  Node k2 = k1.right;
+	  Node k3 = k2.left;
+	  Node b = k3.left;
+	  Node c = k3.right;
+
+	  // Attach k3 and its parent
+	  if (k1.parent == null){ // Case 1: k1 is root
+		  root = k3;
+		  k3.parent = null;
+	  } else { // Case 2: k1 is not root
+		  // Modify k3's parent
+		  Node k0 = k1.parent;
+		  if (k0.left == k1)
+			  k0.left = k3;
+		  else
+			  k0.right = k3;
+		  
+		  k3.parent = k0;
+	  }
+	  
+	  // Modify k3's children
+	  k3.left = k1;
+	  k3.right = k2;
+
+	  // Modify k2
+	  k2.left = c;
+	  k2.parent = k3;
+
+	  // Modify k1
+	  k1.right = b;
+	  k1.parent = k3;
+
+	  // Modify b
+	  if (b != null)
+		  b.parent = k1;
+
+	  // Modify c
+	  if (c != null)
+		  c.parent = k2;
+	  
+	  k1.fixHeight();
+	  k2.fixHeight();
+	  k3.fixHeight();
+	  
+	  return k3;
+  }
+  
+  
+  
 
 }
 

@@ -148,11 +148,23 @@ public class BinarySearchTree<K> implements Tree<K> {
     }
     
     public boolean isOverWeight(){ // Check if node is overweight
-    	int lh = left.height;
-    	int rh = right.height;
-    	if ( lh - rh <= 1 && lh - rh >= -1)
+    	int b = balFactor();
+    	if (b > 1 || b < -1)
     		return true;
     	return false;
+    }
+    
+    public int balFactor(){
+    	if (left != null && right != null)
+    		return right.height - left.height;    		
+    	
+    	if (left != null && right == null)
+    		return - left.height;
+    	
+    	if (right != null && left == null)
+    		return right.height;
+    	
+    	return 0;
     }
   }
   

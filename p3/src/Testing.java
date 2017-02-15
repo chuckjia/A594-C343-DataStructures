@@ -366,7 +366,7 @@ public class Testing {
    * in action.
    **********************************************************************************/
 
-  //@Test
+  @Test
   public void insertAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 3, 8, 1, 2, 7, 9 };
@@ -391,7 +391,7 @@ public class Testing {
     assertEquals(0, avl.height());
   } 
  
-  //@Test
+  @Test
   public void beforeAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     assertTrue(avl.isEmpty());
@@ -404,7 +404,7 @@ public class Testing {
       assertTrue(i - 1 == avl.search(i).getBefore().get());
   }
 
-  //@Test
+  @Test
   public void afterAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     assertTrue(avl.isEmpty());
@@ -417,7 +417,7 @@ public class Testing {
     assertNull(avl.search(n).getAfter());
   }
 
-  //@Test
+  @Test
   public void LLtinyAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 3, 2, 1 };
@@ -440,7 +440,7 @@ public class Testing {
     assertEquals(1, avl.root.right.height);
   }
 
-  //@Test
+  @Test
   public void RRtinyAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 1, 2, 3 };
@@ -463,7 +463,7 @@ public class Testing {
     assertEquals(1, avl.root.right.height);
   }
 
-  //@Test
+  @Test
   public void LRtinyAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 3, 1, 2 };
@@ -486,7 +486,7 @@ public class Testing {
     assertEquals(1, avl.root.right.height);
   }
 
-  //@Test
+  @Test
   public void RLtinyAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 1, 3, 2 };
@@ -509,7 +509,7 @@ public class Testing {
     assertEquals(1, avl.root.right.height);
   }
 
-  //@Test
+  @Test
   public void LLsmallAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 5, 6, 3, 2, 4, 1 };
@@ -541,7 +541,7 @@ public class Testing {
     assertEquals(1, avl.root.right.right.height);
   }
 
-  //@Test
+  @Test
   public void RRsmallAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 2, 1, 4, 3, 5, 6 };
@@ -573,7 +573,7 @@ public class Testing {
     assertEquals(1, avl.root.right.right.height);
   }
 
-  //@Test
+  @Test
   public void LRsmallAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 5, 2, 6, 1, 3 };
@@ -612,7 +612,7 @@ public class Testing {
     assertEquals(1, avl.root.right.right.height);
   }
 
-  //@Test
+  @Test
   public void RLsmallAVL() {
     BinarySearchTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 2, 1, 5, 3, 6 };
@@ -651,7 +651,7 @@ public class Testing {
     assertEquals(1, avl.root.right.right.height);
   }
   
-  //@Test
+  @Test
   public void keysSmallAVL() {
     AVLTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 4, 8, 0, 2, 6, 10 };
@@ -663,7 +663,7 @@ public class Testing {
       assertTrue(ks.get(i - 1) <= ks.get(i));
   }
 
-  //@Test
+  @Test
   public void mediumAVLtest() {    
     int[] a;
     AVLTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
@@ -735,7 +735,7 @@ public class Testing {
     }
   }
 
-  //@Test
+  @Test
   public void bigAVLtest() {
     AVLTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     Random gen = new Random();
@@ -761,7 +761,7 @@ public class Testing {
     }
   }
   
-  //@Test
+  @Test
   public void keysDirtyAVL() {
     AVLTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 26, 5, 28, 32, 4, 8, 0, 2, 3, 6, 10, 12, 22, 1, 14, 20, 16, 18, 7, 24, 30 };
@@ -779,7 +779,7 @@ public class Testing {
       assertTrue(ks.get(i - 1) <= ks.get(i));
   }
   
-  //@Test
+  @Test
   public void rebuildSmallAVL() {
     AVLTree<Integer> avl = new AVLTree<>((Integer x, Integer y) -> x < y);
     int[] a = new int[] { 4, 8, 0, 2, 6, 10 };

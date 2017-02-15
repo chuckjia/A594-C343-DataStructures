@@ -54,12 +54,13 @@ public class AVLTree<K> extends BinarySearchTree<K> {
   }
   
   // Find overweight nodes with early stop
+  // For use when no rotations occur. This optimizes the stopping time
   // @return null if no one found, i.e. the tree is not overweight
   
   private Node findPivotES(Node p){ 
 	  p = p.parent;
 	  while (p != null && !p.isOverWeight()){
-		  if (p.balFactor() == 0)
+		  if (p.balFactor() == 0) // As long as p is balanced we are done
 			  return null;
 		  p = p.parent;
 		  // No need to fix heights, as they are fixed in BST.insert

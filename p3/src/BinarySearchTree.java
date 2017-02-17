@@ -92,6 +92,21 @@ public class BinarySearchTree<K> implements Tree<K> {
      * Returns the location of the node containing the inorder predecessor
      * of this node.
      */
+    
+    public Node getBefore() {
+    	Node p = getBeforeHelper(this); // Assume "this" is not null
+    	// If the one found by the helper is dirty, we keep searching until
+    	// one that is not dirty is found or we hit null
+    	while (p != null && p.dirty) 
+    		p = getBeforeHelper(p);    		
+    	return p;
+    }
+    
+    /*
+     * getBefore helper function
+     * It searches and returns the predecessor of thenode in the tree. The
+     * returned node might be dirty.
+     */
     private Node getBeforeHelper(Node thenode){
     	// Case 1: The node has left subtree
     	if (thenode.left != null){
@@ -107,13 +122,7 @@ public class BinarySearchTree<K> implements Tree<K> {
     		p = p.parent;
     	return p.parent;
     }
-    
-    public Node getBefore() {
-    	Node p = getBeforeHelper(this); // Assume p is not null
-    	while (p != null && p.dirty)
-    		p = getBeforeHelper(p);    		
-    	return p;
-    }
+
 
     /**
      * TODO

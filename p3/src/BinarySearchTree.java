@@ -97,27 +97,27 @@ public class BinarySearchTree<K> implements Tree<K> {
     	Node p = getBeforeHelper(this); // Assume "this" is not null
     	// If the one found by the helper is dirty, we keep searching until
     	// one that is not dirty is found or we hit null
-    	while (p != null && p.dirty) 
+    	while (p != null && p.dirty) // Keep searching if the node found is dirty
     		p = getBeforeHelper(p);    		
     	return p;
     }
     
     /*
      * getBefore helper function
-     * It searches and returns the predecessor of thenode in the tree. The
-     * returned node might be dirty.
+     * It searches and returns the predecessor of thenode in the tree.
+     * The returned node might be dirty. This is fixed in getBefore
      */
     private Node getBeforeHelper(Node thenode){
     	// Case 1: The node has left subtree
-    	if (thenode.left != null){
-    		Node p = thenode.left;
+    	if (thenode.left != null){ 
+    		Node p = thenode.left; // Find the right most node in the left tree
     		while (p.right != null)
     			p = p.right;
     		return p;
     	}
     	
     	// Case 2: The node does not have left subtree
-    	Node p = thenode;
+    	Node p = thenode; // Walk up and find the first node who's a right child 
     	while (p.parent != null && p.parent.right != p)
     		p = p.parent;
     	return p.parent;
@@ -129,14 +129,21 @@ public class BinarySearchTree<K> implements Tree<K> {
      * 
      * Returns the location of the node containing the inorder successor
      * of this node.
-     */
+     */    
+    
+    public Node getAfter() {
+    	Node p = getAfterHelper(this);
+    	while (p != null && p.dirty) // Keep searching if the node found is dirty
+    		p = getAfterHelper(p);
+    	return p;    	
+    }
     
     private Node getAfterHelper(Node thenode){
     	
     	// Case 1: The node has right subtree
     	if ( thenode.right != null ){ 
     		Node p = thenode.right;
-    		while ( p.left != null )
+    		while ( p.left != null ) // Find the left most node in the right tree
     			p = p.left;
     		return p;
     	}
@@ -144,17 +151,11 @@ public class BinarySearchTree<K> implements Tree<K> {
     	// Case 2: The node has no right subtree, and the node is either
     	//     the right child of its parent, or it has no parent
     	Node p = thenode;
-    	while (p.parent != null && p.parent.left != p)
+    	while (p.parent != null && p.parent.left != p) // Walk up 
     		p = p.parent; // Stops at the first encounter of a left child
     	return p.parent; // Return the left child's parent
     }
-    
-    public Node getAfter() {
-    	Node p = getAfterHelper(this);
-    	while (p != null && p.dirty)
-    		p = getAfterHelper(p);
-    	return p;    	
-    }
+
     
     public boolean isOverWeight(){ // Check if node is overweight
     	int b = balFactor();
@@ -163,7 +164,7 @@ public class BinarySearchTree<K> implements Tree<K> {
     	return false;
     }
     
-    public int balFactor(){
+    public int balFactor(){ // Calculate the balance factor of the node
     	if (left != null && right != null)
     		return right.height - left.height;    		
     	
@@ -197,7 +198,7 @@ public class BinarySearchTree<K> implements Tree<K> {
    */
   public Node search(K key) {
 	  Node p = root;
-	  while (p != null && !p.data.equals(key)){
+	  while (p != null && !p.data.equals(key)){ // Stops if p is null or key is found
 		  if (lessThan.test(key, p.data))
 			  p = p.left;
 		  else
@@ -251,7 +252,7 @@ public class BinarySearchTree<K> implements Tree<K> {
    */
   public Node insert(K key) {
 	  
-	  if (root == null){
+	  if (root == null){ // Case when tree is empty
 		  n++;
 		  root = new Node(key);
 		  return root;
@@ -261,26 +262,26 @@ public class BinarySearchTree<K> implements Tree<K> {
   }
   
   private Node insertSearch(K key, Node p){
-	  if (p.data.equals(key)){
+	  if (p.data.equals(key)){ // Key already exists but is dirty
 		  if ( p.dirty ){
 			  n++;
 			  p.dirty = false;
 			  return p; 
 		  } else 
-		  return null;
+		  return p; // Key already exists and is not dirty. Do nothing
 	  }
 
 	  Node result = null;
-	  if (lessThan.test(key, p.data)){
-		  if (p.left == null){
+	  if (lessThan.test(key, p.data)){ // Key < p.data
+		  if (p.left == null){ // No left child, insert there
 			  n++;
 			  p.left = new Node(key);
 			  p.left.parent = p;
 			  result = p.left;
 		  }else
 			  result = insertSearch(key, p.left);
-	  }else{
-		  if (p.right == null){
+	  }else{ // Key > p.data
+		  if (p.right == null){ // No right child, insert there
 			  n++;
 			  p.right = new Node(key);
 			  p.right.parent = p;
@@ -288,7 +289,10 @@ public class BinarySearchTree<K> implements Tree<K> {
 		  }else
 			  result = insertSearch(key, p.right);
 	  }
-	  p.fixHeight();
+	  
+	  // Height fix Needs to be in helper as it fixes all the parents 
+	  // in the recursion
+	  p.fixHeight(); 
 	  return result;
   }
   
@@ -312,7 +316,7 @@ public class BinarySearchTree<K> implements Tree<K> {
    */
   public void remove(K key) {
 	  Node p = search(key);
-	  if (p == null || p.dirty)
+	  if (p == null || p.dirty) // Do nothing if p is already deleted or does not exist
 		  return;
 	  n--;
 	  p.dirty = true;

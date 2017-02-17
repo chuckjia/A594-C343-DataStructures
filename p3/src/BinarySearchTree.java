@@ -155,16 +155,19 @@ public class BinarySearchTree<K> implements Tree<K> {
     		p = p.parent; // Stops at the first encounter of a left child
     	return p.parent; // Return the left child's parent
     }
-
     
-    public boolean isOverWeight(){ // Check if node is overweight
+
+    // Check if node is overweight
+    public boolean isOverWeight(){ 
     	int b = balFactor();
     	if (b > 1 || b < -1)
     		return true;
     	return false;
     }
     
-    public int balFactor(){ // Calculate the balance factor of the node
+    
+    // Calculate the balance factor of the node
+    public int balFactor(){ 
     	if (left != null && right != null)
     		return right.height - left.height;    		
     	
@@ -261,14 +264,22 @@ public class BinarySearchTree<K> implements Tree<K> {
 	  return insertSearch(key, root);
   }
   
+  
+  /* 
+   * insert() helper function
+   * It searches for the location where key should be inserted and inserts the key
+   * @parameter p is the node where we start the search
+   * @return the location of insertion (as the pointer to the node)
+   */
+  
   private Node insertSearch(K key, Node p){
-	  if (p.data.equals(key)){ // Key already exists but is dirty
+	  if (p.data.equals(key)){ // Key already exists in p but is dirty
 		  if ( p.dirty ){
 			  n++;
 			  p.dirty = false;
 			  return p; 
 		  } else 
-		  return p; // Key already exists and is not dirty. Do nothing
+		  return p; // Key already exists in p and is not dirty. Do nothing
 	  }
 
 	  Node result = null;
@@ -290,8 +301,8 @@ public class BinarySearchTree<K> implements Tree<K> {
 			  result = insertSearch(key, p.right);
 	  }
 	  
-	  // Height fix Needs to be in helper as it fixes all the parents 
-	  // in the recursion
+	  // Height fix needs to be in helper as it fixes all the parents 
+	  // during the recursion
 	  p.fixHeight(); 
 	  return result;
   }
@@ -335,10 +346,10 @@ public class BinarySearchTree<K> implements Tree<K> {
   public void rebuild() {
 	  List<K> ks = keys();
 	  clear();
-	  for (K key : ks){
+	  for (K key : ks)
 		  insert(key);
-	  }
 	  /* 
+	   *  // 2nd method: iterator method
 	   * Iterator<K> it = ks.iterator();
 	   * while (it.hasNext())
 	   * 	insert(it.next());
@@ -355,11 +366,22 @@ public class BinarySearchTree<K> implements Tree<K> {
 	  
 	  if (root != null){
 		  Node p = root;
-		  while (p.left != null)
+		  
+		  while (p.left != null) // Find the left most node in the tree (might be dirty)
 			  p = p.left;
 		  
-		  while (p != null && p.dirty) // The leftest node found might be dirty
+		  // If the node found in the last step is dirty, then find the one after
+		  // getAfter() guarantees that it returns one that is not dirty 
+		  if (p.dirty) // Here p is never null because at the end of while loop, p.left == null
 			  p = p.getAfter();
+		  
+		  /*
+		   * For finding the left most node, we could use an algorithm that keeps using getBefore 
+		   * until hitting null and return the last node. However, in that way, we essentially 
+		   * traverse the same route with length O(h). Therefore, it is not more efficient. Also, 
+		   * a null pointer check at the beginning would be needed if we choose that way, makes it
+		   *  harder to implement. 
+		   * */
 
 		  while (p != null){
 			  ls.addLast(p.data);
@@ -386,19 +408,24 @@ public class BinarySearchTree<K> implements Tree<K> {
 	  return result;
   }
   
-  private String toStringHelper(Node key){
-	  String result = key.data.toString() + ", ";
-	  if (key.dirty)
+  // Helper function for toString
+  // @return the string typed representation of the subtree with root at key
+  private String toStringHelper(Node p){
+	  String result = p.data.toString() + ", ";
+	  if (p.dirty)
 		  result = "";
 	  
-	  if (key.left != null){
-		  result = toStringHelper(key.left) + result;
+	  // Concatenate the strings from left and right child trees
+	  if (p.left != null){
+		  result = toStringHelper(p.left) + result;
 	  }
-	  if (key.right != null)
-		  result = result + toStringHelper(key.right);
+	  if (p.right != null)
+		  result = result + toStringHelper(p.right);
 	  return result;
   }
   
+  // Returns a string typed result representing the whole tree, including dirty nodes
+  // This function is mainly for testing purposes
   public String toStringWithDirty(){	
 	  String result = toStringWithDirtyHelper(root);
 	  if(result != "") // Delete the last comma if result is not empty
@@ -407,12 +434,13 @@ public class BinarySearchTree<K> implements Tree<K> {
 	  return result;
   }
   
-  private String toStringWithDirtyHelper(Node key){
-	  String result = key.data.toString() + ", ";
-	  if (key.left != null)
-		  result = toStringHelper(key.left) + result;
-	  if (key.right != null)
-		  result = result + toStringHelper(key.right);
+  // Helper function for toStringWithDirty
+  private String toStringWithDirtyHelper(Node p){
+	  String result = p.data.toString() + ", ";
+	  if (p.left != null)
+		  result = toStringHelper(p.left) + result;
+	  if (p.right != null)
+		  result = result + toStringHelper(p.right);
 	  return result;
   }
 }

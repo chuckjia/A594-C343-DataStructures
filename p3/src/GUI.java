@@ -113,7 +113,7 @@ class GUI extends JFrame {
       }
 
       public void paintComponent(Graphics g) {
-    	g.clearRect(0, 0, getWidth(), getHeight());
+    	g.clearRect(0, 0, getWidth(), getHeight()); // Fix the instant drawing problem
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

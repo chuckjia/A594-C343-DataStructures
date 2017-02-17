@@ -28,35 +28,37 @@ public class AVLTree<K> extends BinarySearchTree<K> {
   
   public Node insert(K key) {
     Node p = super.insert(key);
-    Node q = findPivotES(p);
+    Node q = findPivotES(p); // Using the early stop version of findPivot
     
-    // Whole tree is not overweight/no pivots
+    // Case: whole tree is not overweight/ has no pivots
     if (q == null) 
     	return p;
     
     do{
     	// Rotations
     	if (q.balFactor() < 0){ // L
-    		if (q.left.balFactor() < 0) // LL
+    		if (q.left.balFactor() < 0) // LL rotation 
     			q = rotateLL(q);
     		else
-    			q = rotateLR(q); // LR
+    			q = rotateLR(q); // LR rotation
     	} else { // R
     		if (q.right.balFactor() > 0)
-    			q = rotateRR(q); // RR
+    			q = rotateRR(q); // RR rotation
     		else
-    			q = rotateRL(q); // RL
+    			q = rotateRL(q); // RL rotation
     	}
-    	q = findPivot(q);
+    	// After the first pivot, findPivot mainly deals with height fixing
+    	q = findPivot(q); 
     } while (q != null);
     
     return p;
   }
   
-  // Find overweight nodes with early stop
-  // For use when no rotations occur. This optimizes the stopping time
-  // @return null if no one found, i.e. the tree is not overweight
-  
+  /* 
+   * Find overweight nodes with early stop
+   * For use when no rotations occur. This optimizes the stopping time
+   * @return null if no one found, i.e. the tree is not overweight
+   */
   private Node findPivotES(Node p){ 
 	  p = p.parent;
 	  while (p != null && !p.isOverWeight()){
@@ -70,8 +72,11 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 	  return p;
   }
 
-  // Find overweight nodes
-  // @return null if no one found, i.e. the tree is not overweight
+  /* 
+   * Find overweight nodes
+   * Heights of nodes are fixed along the traversal
+   * @return null if no one found, i.e. the tree is not overweight
+   */
   private Node findPivot(Node p){
 	  p = p.parent;
 	  while (p != null && !p.isOverWeight()){
@@ -84,6 +89,10 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 	  return p;
   }
   
+  
+  /*
+   * Performs single rotation type LL
+   * */
   private Node rotateLL(Node k1){
 	  Node k2 = k1.left;
 	  Node b = k2.right;
@@ -118,6 +127,10 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 	  return k2;
   }
   
+  
+  /*
+   * Performs single rotation type RR
+   * */
   
   private Node rotateRR(Node k1){
 	  Node k2 = k1.right;
@@ -154,6 +167,9 @@ public class AVLTree<K> extends BinarySearchTree<K> {
   }
   
   
+  /*
+   * Performs double rotation type LR
+   * */
   private Node rotateLR(Node k1){
 	  Node k2 = k1.left;
 	  Node k3 = k2.right;
@@ -203,6 +219,9 @@ public class AVLTree<K> extends BinarySearchTree<K> {
   }
   
   
+  /*
+   * Performs double rotation type RL
+   * */
   private Node rotateRL(Node k1){
 	  Node k2 = k1.right;
 	  Node k3 = k2.left;
@@ -250,10 +269,6 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 	  
 	  return k3;
   }
-  
-  
-  
-
 }
 
 

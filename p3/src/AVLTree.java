@@ -27,31 +27,31 @@ public class AVLTree<K> extends BinarySearchTree<K> {
    */
   
   public Node insert(K key) {
-    Node p = super.insert(key);
-    Node q = findPivotES(p); // Using the early stop version of findPivot
-    
-    // Case: whole tree is not overweight/ has no pivots
-    if (q == null) 
-    	return p;
-    
-    do{
-    	// Rotations
-    	if (q.balFactor() < 0){ // L
-    		if (q.left.balFactor() < 0) // LL rotation 
-    			q = rotateLL(q);
-    		else
-    			q = rotateLR(q); // LR rotation
-    	} else { // R
-    		if (q.right.balFactor() > 0)
-    			q = rotateRR(q); // RR rotation
-    		else
-    			q = rotateRL(q); // RL rotation
-    	}
-    	// After the first pivot, findPivot mainly deals with height fixing
-    	q = findPivot(q); 
-    } while (q != null);
-    
-    return p;
+	  Node p = super.insert(key);
+	  Node q = findPivotES(p); // Using the early stop version of findPivot
+
+	  // Case: whole tree is not overweight/ has no pivots
+	  if (q == null) 
+		  return p;
+
+	  do{
+		  // Rotations
+		  if (q.balFactor() < 0){ // L
+			  if (q.left.balFactor() < 0) // LL rotation 
+				  q = rotateLL(q);
+			  else
+				  q = rotateLR(q); // LR rotation
+		  } else { // R
+			  if (q.right.balFactor() > 0)
+				  q = rotateRR(q); // RR rotation
+			  else
+				  q = rotateRL(q); // RL rotation
+		  }
+		  // After the first pivot, findPivot mainly deals with height fixing
+		  q = findPivot(q); 
+	  } while (q != null);
+
+	  return p;
   }
   
   /* 
@@ -110,7 +110,7 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 
 		  k2.parent = k0;
 	  }
-	  
+
 	  // Modify k2's children
 	  k2.right = k1;
 
@@ -135,7 +135,7 @@ public class AVLTree<K> extends BinarySearchTree<K> {
   private Node rotateRR(Node k1){
 	  Node k2 = k1.right;
 	  Node b = k2.left;
-	  
+
 	  // Attach k2 and its parent
 	  if (k1.parent == null){ // Case 1: k1 is root
 		  root = k2;
@@ -146,10 +146,10 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 			  k0.left = k2;
 		  else
 			  k0.right = k2;
-		  
+
 		  k2.parent = k0;
 	  }
-	  
+
 	  // Modify k2's children	  
 	  k2.left = k1;
 
@@ -187,10 +187,10 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 			  k0.left = k3;
 		  else
 			  k0.right = k3;
-		  
+
 		  k3.parent = k0;
 	  }
-	  
+
 	  // Modify k3's children
 	  k3.left = k2;
 	  k3.right = k1;
@@ -210,11 +210,11 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 	  // Modify c
 	  if (c != null)
 		  c.parent = k1;
-	  
+
 	  k1.fixHeight();
 	  k2.fixHeight();
 	  k3.fixHeight();
-	  
+
 	  return k3;
   }
   
@@ -239,10 +239,10 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 			  k0.left = k3;
 		  else
 			  k0.right = k3;
-		  
+
 		  k3.parent = k0;
 	  }
-	  
+
 	  // Modify k3's children
 	  k3.left = k1;
 	  k3.right = k2;
@@ -262,11 +262,11 @@ public class AVLTree<K> extends BinarySearchTree<K> {
 	  // Modify c
 	  if (c != null)
 		  c.parent = k2;
-	  
+
 	  k1.fixHeight();
 	  k2.fixHeight();
 	  k3.fixHeight();
-	  
+
 	  return k3;
   }
 }

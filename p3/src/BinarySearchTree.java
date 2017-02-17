@@ -50,9 +50,9 @@ public class BinarySearchTree<K> implements Tree<K> {
      * Return true iff this node is a leaf in the tree.
      */
     protected boolean isLeaf() {
-      return left == null && right == null;
+    	return left == null && right == null;
     }
-    
+
     /**
      * TODO
      * 
@@ -423,6 +423,7 @@ public class BinarySearchTree<K> implements Tree<K> {
 		  result = result + toStringHelper(p.right);
 	  return result;
   }
+  
   
   // Returns a string typed result representing the whole tree, including dirty nodes
   // This function is mainly for testing purposes

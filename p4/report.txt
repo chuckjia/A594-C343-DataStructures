@@ -1,0 +1,78 @@
+Full Name: Chuck Jia
+Username: jiac
+Lab Section: Lab F
+
+Book 1 Alice In Wonderland
+
+-------------------------------------------------
+Original text               |  163675 characters
+Average length of a code    |  4.60 bits
+Text encoded in             |  752855 bits
+Savings in bits             |  556545 bits
+Savings percentage          |  42.50382%
+Compressed text encoded in  |  94108 characters
+Savings in characters       |  69567 characters
+Decompressing yields        |  752855 bits
+Recovered text has          |  163675 characters
+-------------------------------------------------
+
+
+Book 2 Moby Dick
+
+-------------------------------------------------
+Original text               |  12352 characters
+Average length of a code    |  4.43 bits
+Text encoded in             |  54691 bits
+Savings in bits             |  44125 bits
+Savings percentage          |  44.653698%
+Compressed text encoded in  |  6838 characters
+Savings in characters       |  5514 characters
+Decompressing yields        |  54691 bits
+Recovered text has          |  12352 characters
+-------------------------------------------------
+
+
+
+Book 3 The Thirty Nine Steps
+
+-------------------------------------------------
+Original text               |  235918 characters
+Average length of a code    |  4.52 bits
+Text encoded in             |  1066557 bits
+Savings in bits             |  820787 bits
+Savings percentage          |  43.489%
+Compressed text encoded in  |  133321 characters
+Savings in characters       |  102597 characters
+Decompressing yields        |  1066557 bits
+Recovered text has          |  235918 characters
+-------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -152,7 +152,6 @@ public class Testing {
 		// Heap now: [2, 1, 3, 4, 5]
 		assert heap.peek() == 2;
 		heap.swap(0, 1);
-		System.out.println(heap.peek());
 		assert heap.peek() == 1;
 		heap.swap(0, 1);
 		heap.swap(0, 2);

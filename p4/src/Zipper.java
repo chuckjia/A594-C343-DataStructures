@@ -40,16 +40,30 @@ public class Zipper {
 	 * Returns the text string corresponding to the given bit string.
 	 */  
 	public String decode(String bits) {
-		StringBuilder bitsBuilder = new StringBuilder(bits);
+		StringBuilder bitsBuilder = new StringBuilder();
 		StringBuilder ans = new StringBuilder();
-		
-		while (bitsBuilder.length() > 0){
-			char ch = ht.decodeChar(bitsBuilder.toString());
-			ans.append(ch);
-			int k = book.encodeChar(ch).length();
-			bitsBuilder.delete(0, k);
+		int i = 0;
+		int n = bits.length();
+		boolean thrown = true; // Used to determine if exception is thrown
+		char ch = '\0';
+
+		while (i < n){
+			bitsBuilder.append(bits.charAt(i)); // Take one more digit
+			
+			try{
+				ch = ht.decodeChar(bitsBuilder.toString());
+				thrown = false;
+			} catch (DecodeException e){}
+
+			if(thrown == false){ // If ch is successfully decoded
+				ans.append(ch);
+				bitsBuilder.setLength(0);
+				thrown = true;
+			}
+			
+			i++;
 		}
-		
+
 		return ans.toString();
 	}
 
@@ -82,11 +96,11 @@ public class Zipper {
 	public String decompress(String compressedText) {
 		// Process the head byte to retrieve the size of the last byte.
 		int lastBiteSize = (int) compressedText.charAt(0);
-		String bits = "";
+		StringBuilder bits = new StringBuilder();
 		int n = compressedText.length();
 		for (int i = 1; i < n - 1; i++) 
-			bits += Util.asciiToBits(compressedText.charAt(i), Constants.BITESIZE);
-		bits += Util.asciiToBits(compressedText.charAt(n - 1), lastBiteSize);
+			bits.append( Util.asciiToBits(compressedText.charAt(i), Constants.BITESIZE) );
+		bits.append( Util.asciiToBits(compressedText.charAt(n - 1), lastBiteSize) );
 		return bits.toString();
 	} 
 }

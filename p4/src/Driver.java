@@ -26,7 +26,7 @@ public class Driver {
         + "fffff";*/
 		// String text = Util.loadFile(Constants.ALICE);
 		// String text = Util.loadFile(Constants.MOBY_DICK);
-		String text = Util.loadFile("the-thirty-nine-steps.txt");
+		 String text = Util.loadFile("the-thirty-nine-steps.txt");
 
 		System.out.println();
 		System.out.println("The original text has " + text.length() + " characters.");

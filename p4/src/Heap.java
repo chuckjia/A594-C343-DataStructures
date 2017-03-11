@@ -80,7 +80,7 @@ public class Heap<E> implements PriorityQueue<E> {
 			return keys.remove(0);
 		
 		E ans = keys.get(0);
-		keys.set(0, keys.remove(size() - 1));
+		keys.set(0, keys.remove(size() - 1)); // Copy the last one to the first position
 		siftDown(0);
 		return ans;
 	}

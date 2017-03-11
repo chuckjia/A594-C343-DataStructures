@@ -125,10 +125,10 @@ public class HuffmanTree {
 	}
 
 	private String lookupHelper(char ch, Node pos, String res){
-		if (pos == null)
+		if (pos == null) // Base case 1
 			return null;
 		
-		if (pos.isLeaf()){
+		if (pos.isLeaf()){ // Base case 2
 			if( ch == pos.key )
 				return res;
 			else
@@ -139,6 +139,7 @@ public class HuffmanTree {
 		String ans = lookupHelper(ch, pos.left, res + "0");
 		if (ans != null) // If found in left child tree, then no need to search any more
 			return ans;
+		// If did not find in left child tree, then:
 		ans = lookupHelper(ch, pos.right, res + "1");
 		return ans;			
 	}

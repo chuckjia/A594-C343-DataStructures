@@ -25,11 +25,11 @@ public class Zipper {
 	 * Returns the bit string encoding of the given plain text.
 	 */
 	public String encode(String plainText) {
-		char[] textArray = plainText.toCharArray();
+		int n = plainText.length();
 		StringBuilder ans = new StringBuilder();
 
-		for (char key : textArray)
-			ans.append( book.encodeChar(key) );
+		for (int i = 0; i < n; i++)
+			ans.append( book.encodeChar(plainText.charAt(i)) );
 
 		return ans.toString();
 	}
@@ -49,7 +49,6 @@ public class Zipper {
 
 		while (i < n){
 			bitsBuilder.append(bits.charAt(i)); // Take one more digit
-			
 			try{
 				ch = ht.decodeChar(bitsBuilder.toString());
 				thrown = false;
@@ -57,10 +56,9 @@ public class Zipper {
 
 			if(thrown == false){ // If ch is successfully decoded
 				ans.append(ch);
-				bitsBuilder.setLength(0);
+				bitsBuilder.setLength(0); // Clear the builder
 				thrown = true;
-			}
-			
+			}			
 			i++;
 		}
 

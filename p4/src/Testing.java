@@ -30,7 +30,7 @@ public class Testing {
 		assertTrue(0 == ft.get('c'));    
 	}
 
-	//@Test
+	@Test
 	public void smallFreqTable() {
 		FrequencyTable ft = new FrequencyTable("abacca");
 		assertEquals(3, ft.size());
@@ -40,7 +40,7 @@ public class Testing {
 		assertTrue(2 == ft.get('c'));    
 	}
 
-	//@Test
+	@Test
 	public void mediumFreqTable() {
 		FrequencyTable ft = new FrequencyTable("a");
 		assertTrue(1 == ft.get('a'));
@@ -53,7 +53,7 @@ public class Testing {
 		assertTrue(0 == ft.get('d'));
 	}
 
-	//@Test
+	@Test
 	public void bigFreqTable() {
 		String alpha = "abcdefghijklmnopqrstuvwxyz";
 		alpha += alpha.toUpperCase();

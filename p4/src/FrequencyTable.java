@@ -18,10 +18,12 @@ public class FrequencyTable extends HashMap<Character, Integer> {
 	 * Constructs a table of character counts from the given text string.
 	 */
 	public FrequencyTable(String text) {
-		char[] strArray = text.toCharArray();
+		int n = text.length();
 
-		for (char key : strArray) // No need to check if key is in hashmap because of our override
+		for (int i = 0; i < n; i++){ // No need to check if key is in hashmap because of our override
+			char key = text.charAt(i);
 			this.put(key, this.get(key) + 1);
+		}
 	}
 
 	/**

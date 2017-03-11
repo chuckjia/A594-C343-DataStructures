@@ -81,14 +81,14 @@ public class HuffmanTree {
 	 * @throws DecodeException if bits does not match a character in the tree.
 	 */
 	public char decodeChar(String bits) {
-		char[] bitsArray = bits.toCharArray(); // Transform String to array of char
+		int n = bits.length();
 		Node pos = root;
 
-		for (char ch : bitsArray){
-			int k = Character.getNumericValue(ch);
+		for (int i = 0; i < n; i++){
+			int k = Character.getNumericValue(bits.charAt(i));
 			if (pos.key != '\0') // If a valid key is found, then break out of for loop
 				break;
-			if (k != 0 && k != 1) // Wrong bits String
+			if (k != 0 && k != 1) // If we have invalid bits String
 				throw new DecodeException(bits);
 			if (k == 0){ // Turn left down the path
 				if (pos.left == null)
@@ -119,12 +119,15 @@ public class HuffmanTree {
 	 */
 	public String lookup(char ch) {
 		String ans = lookupHelper(ch, root, "");
-		if (ans == null) // This is case where the character does not appear in the tree
+		if (ans == null) // Case where the character does not appear in the tree
 			throw new EncodeException(ch);
 		return ans; 
 	}
 
 	private String lookupHelper(char ch, Node pos, String res){
+		if (pos == null)
+			return null;
+		
 		if (pos.isLeaf()){
 			if( ch == pos.key )
 				return res;
@@ -132,23 +135,12 @@ public class HuffmanTree {
 				return null;
 		}
 
-		if (pos.left != null && pos.right == null){
-			res = res + "0";
-			return lookupHelper(ch, pos.left, res);
-		}
-
-		if (pos.left == null && pos.right != null){
-			res = res + "1";
-			return lookupHelper(ch, pos.right, res);
-		}
-
-		//if (pos.left != null && pos.right != null)
-		String res1 = lookupHelper(ch, pos.left, res + "0");
-		String res2 = lookupHelper(ch, pos.right, res + "1");
-		// This return method works assuming that no duplicate characters exist in the tree
-		if (res1 != null) 
-			return res1;
-		return res2;			
+		// This return method works assuming that no duplicate characters exist in the tree	
+		String ans = lookupHelper(ch, pos.left, res + "0");
+		if (ans != null) // If found in left child tree, then no need to search any more
+			return ans;
+		ans = lookupHelper(ch, pos.right, res + "1");
+		return ans;			
 	}
 }
 

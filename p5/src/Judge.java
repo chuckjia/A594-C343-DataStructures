@@ -71,13 +71,12 @@ public class Judge {
 	 */
 	public int score(String s1, String s2) {
 		int n = s1.length();
-		if (n != s2.length())
-			return Integer.MIN_VALUE;
+		if (n != s2.length()) // We do not expect two Strings with different lengths
+			throw new RuntimeException();
 		
 		int ans = 0;
 		for (int i = 0; i < n; i++)
 			ans = ans + score(s1.charAt(i), s2.charAt(i));
-		
 		return ans;
 	}
 }

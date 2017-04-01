@@ -101,8 +101,7 @@ public class SequenceAligner {
 	private void fillCache() {
 		cache[0][0] = new Result(0, Direction.NONE); // Filling cache[0][0]
 		for (int i = 1; i <= n; i++){ // Fill the first column
-			int score = cache[i - 1][0].getScore() + judge.score(x.charAt(i - 1), Constants.GAP_CHAR);
-			/* Note on the method that we calculate score:
+			/* Note on the method that we calculate score below:
 			 *   For the purpose of solving this particular problem under this specific setting, we can 
 			 *   fill in the first column and row by directly using gapCost value in the Judge class or 
 			 *   even directly using the score -1, e.g. we can calculate the score by using
@@ -110,7 +109,8 @@ public class SequenceAligner {
 			 *   However, we chose the method above in the calculation of score in order to achieve 
 			 *   higher generality. This way, we would be able to easily accommodate more general scoring 
 			 *   mechanisms, allowing our program to apply to different models. 
-			 */  
+			 */ 
+			int score = cache[i - 1][0].getScore() + judge.score(x.charAt(i - 1), Constants.GAP_CHAR); 
 			cache[i][0] = new Result(score, Direction.UP);
 			// Note on the above 2 lines: The above two lines can be combined to one. But to improve
 			// readability, we chose to use 2 lines (for the purpose of creating a more readable homework
@@ -121,7 +121,7 @@ public class SequenceAligner {
 			cache[0][j] = new Result(score, Direction.LEFT);
 		}
 
-		for (int i = 1; i <= n; i++)
+		for (int i = 1; i <= n; i++) // n, m are included
 			for (int j = 1; j <= m; j++){
 				int diag = cache[i - 1][j - 1].getScore() + judge.score(x.charAt(i - 1), y.charAt(j - 1));
 				int left = cache[i][j - 1].getScore() + judge.score(Constants.GAP_CHAR, y.charAt(j - 1));
@@ -163,11 +163,16 @@ public class SequenceAligner {
 	private void traceback() {
 		StringBuilder xBuilder = new StringBuilder(); // To improve efficiency, StringBuilder are used instead of String
 		StringBuilder yBuilder = new StringBuilder();
-		tracebackHelper(n, m, xBuilder, yBuilder);
+		tracebackHelper(n, m, xBuilder, yBuilder); // Recursion with total complexity of O(n + m)
 		alignedX = xBuilder.reverse().toString(); // Complexity: O(n)
 		alignedY = yBuilder.reverse().toString(); // Complexity: O(m)
 	}
-
+	
+	/*
+	 * Helper function for traceback(). It recursively marks the path and append characters
+	 * to xBuilder and yBuilder. This method marks the path "diagonally" (very roughly speaking).
+	 * Therefore, the total complexity is of O(n + m) when called from lower right corner.
+	 * */
 	private void tracebackHelper(int i, int j, StringBuilder xBuilder, StringBuilder yBuilder) {
 		Result curr = cache[i][j];
 		curr.markPath();

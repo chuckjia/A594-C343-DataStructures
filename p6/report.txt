@@ -3,7 +3,8 @@
 2. KMP is fast when the alphabet is small and slow when the alphabet is large because of having more chance of
 failure).
 
-3. Boyer-Moore is fast when the alphabet is large, slow when the alphabet is small.
+3. Boyer-Moore is fast when the alphabet is large, slow when the alphabet is small. This one works best for 
+Twitter.
 
 
 Analysis:

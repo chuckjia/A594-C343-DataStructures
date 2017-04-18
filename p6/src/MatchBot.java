@@ -24,9 +24,9 @@ public class MatchBot extends TwitterBot {
 		int count = 0;
 		int m = pattern.length();
 		int[] flink = new int[m + 1];
-		count += StringMatch.buildKMP(pattern, flink);
+		count += StringMatch.buildKMP(pattern, flink); // Update count
 		
-		for (String text : tweets){
+		for (String text : tweets){ // Iterate all tweets
 			Result res = StringMatch.runKMP(pattern, text, flink);
 			if (res.pos != -1)
 				ans.add(text);
@@ -46,7 +46,7 @@ public class MatchBot extends TwitterBot {
 	public int searchTweetsNaive(String pattern, List<String> ans) {
 		int count = 0;
 		int m = pattern.length();
-		for (String text : tweets){
+		for (String text : tweets){ // Iterate all tweets
 			Result res = StringMatch.matchNaive(pattern, text);
 			if (res.pos != -1)
 				ans.add(text);
@@ -54,13 +54,13 @@ public class MatchBot extends TwitterBot {
 		}
 		return count;
 	}
-	/*
+	
 	public int searchTweetsBoyerMoore(String pattern, List<String> ans) {
 		int count = 0;
 		int m = pattern.length();
-		int[] delta1 = new int[m];
+		int[] delta1 = new int[Constants.SIGMA_SIZE];
 		StringMatch.buildDelta1(pattern, delta1);
-		for (String text : tweets){
+		for (String text : tweets){ // Iterate all tweets
 			Result res = StringMatch.runBoyerMoore(pattern, text, delta1);
 			if (res.pos != -1)
 				ans.add(text);
@@ -68,10 +68,10 @@ public class MatchBot extends TwitterBot {
 		}
 		return count;
 	}
-	*/
+	
 
 	public static void main(String... args) {
-		String handle = "realDonaldTrump", pattern = "mexico";
+		String handle = "taylorswift13", pattern = "morning";
 		MatchBot bot = new MatchBot(handle, 2000);
 
 		// Search all tweets for the pattern.
@@ -89,8 +89,21 @@ public class MatchBot extends TwitterBot {
 			System.out.println(pattern + " appears at index " + 
 					tweet.toLowerCase().indexOf(pattern.toLowerCase()));
 		}
-
+		
+		System.out.println("\n----- ----- ----- ----- ----- ----- -----\n"
+				+ "Below are results by running Boyer-Moore.\n"
+				+ "----- ----- ----- ----- ----- ----- -----");
 		// Do something similar for the Boyer-Moore matching algorithm.
-
+		List<String> ansBoyerMoore = new ArrayList<>();
+		int compsBoyerMoore = bot.searchTweetsBoyerMoore(pattern, ansBoyerMoore);
+		System.out.println("Boyer-Moore comps = " + compsBoyerMoore);
+		
+		for (int i = 0; i < ansBoyerMoore.size(); i++) {
+			String tweet = ansBoyerMoore.get(i);
+			assert tweet.equals(ansNaive.get(i));
+			System.out.println(i++ + ". " + tweet);
+			System.out.println(pattern + " appears at index " + 
+					tweet.toLowerCase().indexOf(pattern.toLowerCase()));
+		}
 	}
 }

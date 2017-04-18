@@ -22,8 +22,9 @@ public class StringMatch {
 		if (n >= m){ // Make sure pattern is shorter than text
 			int pos = 0, i = 0, j = 0;
 			while (pos <= n - m){
-				// If corresponding characters in pattern and text match 
-				if (count++ > -1 && pattern.charAt(i) == text.charAt(j)) { // count++ here to increment count
+				count++; // Increment count
+				// If corresponding characters in pattern and text match
+				if (pattern.charAt(i) == text.charAt(j)) {
 					if (i == m - 1)
 						return new Result(pos, count);
 					else {
@@ -51,14 +52,19 @@ public class StringMatch {
 		int m = pattern.length();
 		int count = 0;
 		flink[0] = -1;
-		if (m == 0)
+		if (m == 0) // Empty pattern
 			return count;
 		flink[1] = 0;		
 		for (int i = 2; i <= m; i++){
 			int j = flink[i - 1];
 			char nextChar = pattern.charAt(i - 1);
-			while (j > -1 && count++ > -1 && pattern.charAt(j) != nextChar)
-				j = flink[j];
+			while (j > -1){
+				count++; // Incrementing count
+				if (pattern.charAt(j) != nextChar)
+					j = flink[j];
+				else
+					break;
+			}
 			flink[i] = j + 1;
 		}
 		return count;
@@ -77,7 +83,7 @@ public class StringMatch {
 		int j = -1, state = -1;
 		char ch = '\0';
 		while (true) {
-			if (state == -1 || count++ >= 0 && ch == pattern.charAt(state)) {
+			if (state == -1 || count++ >= 0 && ch == pattern.charAt(state)) { // Count is incremented within the condition
 				state++;
 				if (state == m)
 					return new Result(j - m + 1, count);
@@ -110,16 +116,15 @@ public class StringMatch {
 	 */
 	public static void buildDelta1(String pattern, int[] delta1) {
 		int m = pattern.length();
-		for (char ch = 'A'; ch <= 'z'; ch++)
-			delta1[ch] = m;
+		int l = delta1.length;
+		// Our program is compatible with empty input
+		for (int i = 0; i < l; i++) // Populates with largest number
+			delta1[i] = m;
 		
-		HashSet<Character> s = new HashSet<>();
 		for (int i = m - 1; i >= 0; i--){
 			char ch = pattern.charAt(i);
-			if (!s.contains(ch)){
-				s.add(ch);
+			if (delta1[ch] == m)
 				delta1[ch] = m - 1 - i;
-			}
 		}
 	}
 
@@ -131,8 +136,11 @@ public class StringMatch {
 	 */
 	public static Result runBoyerMoore(String pattern, String text, int[] delta1) {
 		int m = pattern.length(), n = text.length();
+		
+		// Our program is compatible with cases where m == 0 and/or n == 0
 		if (m > n)
 			return new Result(-1, 0);
+		
 		int count = 0;
 		int t = m - 1;
 		while (t < n){
@@ -145,7 +153,13 @@ public class StringMatch {
 			if (i < 0)
 				return new Result(t - m + 1, count);
 			int partialMatch = m - i - 1;
-			int slide = Math.max(1, delta1[(int) text.charAt(j)] - partialMatch);
+			char ch = text.charAt(j);
+			int delta1Val;
+			if (ch >= 0 && ch <= 127) // Make sure that our program is compatible with characters outside of ASCII
+				delta1Val = delta1[text.charAt(j)];
+			else
+				delta1Val = m;
+			int slide = Math.max(1, delta1Val - partialMatch); // Check if char is in ASCII
 			t = t + slide;
 		}
 		

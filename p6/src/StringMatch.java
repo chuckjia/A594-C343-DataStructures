@@ -1,5 +1,8 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 
 /**
  * TODO #1
@@ -17,7 +20,7 @@ public class StringMatch {
 		int m = pattern.length();
 		if (m == 0)
 			return new Result(0, count);
-		
+
 		int n = text.length();
 		if (n >= m){ // Make sure pattern is shorter than text
 			int pos = 0, i = 0, j = 0;
@@ -79,7 +82,7 @@ public class StringMatch {
 	public static Result runKMP(String pattern, String text, int[] flink) {
 		int m = pattern.length(), n = text.length();
 		int count = 0;
-		
+
 		int j = -1, state = -1;
 		char ch = '\0';
 		while (true) {
@@ -120,7 +123,7 @@ public class StringMatch {
 		// Our program is compatible with empty input
 		for (int i = 0; i < l; i++) // Populates with largest number
 			delta1[i] = m;
-		
+
 		for (int i = m - 1; i >= 0; i--){
 			char ch = pattern.charAt(i);
 			if (delta1[ch] == m)
@@ -136,11 +139,11 @@ public class StringMatch {
 	 */
 	public static Result runBoyerMoore(String pattern, String text, int[] delta1) {
 		int m = pattern.length(), n = text.length();
-		
+
 		// Our program is compatible with cases where m == 0 and/or n == 0
 		if (m > n)
 			return new Result(-1, 0);
-		
+
 		int count = 0;
 		int t = m - 1;
 		while (t < n){
@@ -162,7 +165,7 @@ public class StringMatch {
 			int slide = Math.max(1, delta1Val - partialMatch); // Check if char is in ASCII
 			t = t + slide;
 		}
-		
+
 		return new Result(-1, count);
 	}
 
@@ -175,12 +178,134 @@ public class StringMatch {
 		buildDelta1(pattern, delta1);
 		return runBoyerMoore(pattern, text, delta1);
 	}
-	
+
+
 	public static void main(String[] args){
-		String pattern = "AABC";
-		int[] flink = new int[5];
-		buildKMP(pattern, flink);
-		System.out.println(Arrays.toString(flink));
+		// Experiments
+		System.out.println("----- ----- ----- ----- -----\n"
+				+ "Experiments With English Text\n"
+				+ "----- ----- ----- ----- -----");
+		String text = "United Continental Holdings, struggling to quell fallout from "
+				+ "the forcible removal of a passenger from a flight, said its chief executive, "
+				+ "Oscar Munoz, would no longer become chairman next year as planned, according to "
+				+ "a filing on Friday. United also said it would revise executive compensation based"
+				+ " on the airline¡¯s customer performance. Having an independent chairman of the "
+				+ "board is a means to ensure that Mr. Munoz is able to more exclusively focus on his"
+				+ " role as chief executive officer,¡± the company said in the filing, made with the "
+				+ "Securities and Exchange Commission.";
+		System.out.println("Text length: " + text.length());
+		int n = 3;
+		List<String> patternList = new ArrayList<String>(n);
+		patternList.add("in");
+		patternList.add("officer");
+		patternList.add("exclusively");
+		for (int i = 0; i < n; i++){
+			String pattern = patternList.get(i);
+			int compNaive = matchNaive(pattern, text).comps;
+			int compKMP = matchKMP(pattern, text).comps;
+			int compBoyerMoore = matchBoyerMoore(pattern, text).comps;
+			System.out.println("Experiment #" + (i + 1));
+			System.out.println("Pattern: " + pattern);
+			System.out.println("Comparisons: "
+					+ "Naive " + compNaive 
+					+ ", KMP " + compKMP
+					+ ", BoyerMoore " + compBoyerMoore + "\n");
+		}
+
+
+		// Experiments
+		System.out.println("\n----- ----- ----- ----- ----- -----\n"
+				+ "Experiments With Large Random Text\n"
+				+ "----- ----- ----- ----- ----- -----");
+		Random rand = new Random();
+		StringBuilder tBuilder = new StringBuilder();
+		int m = 20000;
+		String alpha = "abcdefghijklmnopqrstuvwxyz ";
+		int alphaLength = alpha.length();
+		for (int i = 0; i < m; i++){
+			int k = rand.nextInt(alphaLength);
+			tBuilder.append(alpha.charAt(k));
+		}
+		n = 3;
+		patternList = new ArrayList<String>(n);
+		patternList.add("yes");
+		patternList.add("officer");
+		patternList.add("exclusively");
+		for (int i = 0; i < n; i++){
+			String pattern = patternList.get(i);
+			int compNaive = matchNaive(pattern, text).comps;
+			int compKMP = matchKMP(pattern, text).comps;
+			int compBoyerMoore = matchBoyerMoore(pattern, text).comps;
+			System.out.println("Experiment #" + (i + 1));
+			System.out.println("Pattern: " + pattern);
+			System.out.println("Comparisons: "
+					+ "Naive " + compNaive 
+					+ ", KMP " + compKMP
+					+ ", BoyerMoore " + compBoyerMoore + "\n");
+		}
+
+		// Experiments
+		System.out.println("\n----- ----- ----- ----- -----\n"
+				+ "Experiments With Simple Text\n"
+				+ "----- ----- ----- ----- -----");
+		rand = new Random();
+		tBuilder = new StringBuilder();
+		m = 20000;
+		for (int i = 0; i < m; i++){
+			int k = rand.nextInt(4);
+			tBuilder.append(k);
+		}
+		text = tBuilder.toString();
+		n = 3;
+		patternList = new ArrayList<String>(n);
+		patternList.add("01000201302");
+		patternList.add("00200010203");
+		patternList.add("02301123011");
+		for (int i = 0; i < n; i++){
+			String pattern = patternList.get(i);
+			Result resNaive = matchNaive(pattern, text);
+			Result resKMP = matchKMP(pattern, text);
+			Result resBoyerMoore = matchBoyerMoore(pattern, text);
+			System.out.println("Experiment #" + (i + 1));
+			System.out.println("Pattern: " + pattern);
+			System.out.println("Comparisons: "
+					+ "Naive " + resNaive.comps 
+					+ ", KMP " + resKMP.comps
+					+ ", BoyerMoore " + resBoyerMoore.comps + "\n");
+
+		}
+
+		// Experiments
+		System.out.println("\n----- ----- ----- ----- -----\n"
+				+ "Experiments With Repeated Text\n"
+				+ "----- ----- ----- ----- -----");
+		rand = new Random();
+		tBuilder = new StringBuilder();
+		m = 20000;
+		for (int i = 0; i < m; i++){
+			int k = i % 2;
+			tBuilder.append(k);
+		}
+		text = tBuilder.toString();
+		n = 3;
+		patternList = new ArrayList<String>(n);
+		patternList.add("010101");
+		patternList.add("1010010");
+		patternList.add("0101011");
+		for (int i = 0; i < n; i++){
+			String pattern = patternList.get(i);
+			Result resNaive = matchNaive(pattern, text);
+			Result resKMP = matchKMP(pattern, text);
+			Result resBoyerMoore = matchBoyerMoore(pattern, text);
+			System.out.println("Experiment #" + (i + 1));
+			System.out.println("Pattern: " + pattern);
+			System.out.println("Comparisons: "
+					+ "Naive " + resNaive.comps 
+					+ ", KMP " + resKMP.comps
+					+ ", BoyerMoore " + resBoyerMoore.comps + "\n");
+
+		}
+
 	}
 
 }

@@ -1,50 +1,197 @@
-1. Naive algorithm is not as fast as the other two, because it only restarts by step 1.
+Observations from Experiment Results
 
-2. KMP is fast when the alphabet is small and slow when the alphabet is large because of having more chance of
-failure).
+1. Of the three algorithms, Boyer-Moore works the best on Tweets. Also, for most data 
+   type we tested, it is also the best algorithm.
 
-3. Boyer-Moore is fast when the alphabet is large, slow when the alphabet is small. This one works best for 
-Twitter.
+2. KMP and Naive algorithm are mostly similar in number of comparisons performed. 
+   However, KMP do perform better than Naive on simple texts (smaller alphabets) and
+   especially on repeated texts. KMP performs even better than Boyer-Moore in some 
+   cases of repeated text.
 
-
-Analysis:
-
-As we can see from the experiment results below, in searching English texts, Boyer-Moore always uses the 
-lowest number of comparisons. 
-
-But when the pattern is shorted or with fewer words, its advantage is not as much as with longer patterns. 
-This is consistent with our analysis in 2 and 3. 
-
-Naive algorithm always has the worst performance, as can be seen in the results.
+3. Also, when the alphabet is smaller, the advantage of Boyer-Moore over the other 2 
+   algorithms is less in most cases.
 
 
-Experiment results:
+Summary: Best Algorithm
 
-------------------------
-Twitter: realDonaldTrump
-------------------------
-Pattern: Media
-naive comps = 226649, KMP comps = 234577, Boyer-Moore comps = 53715
-
-Pattern: of 
-naive comps = 207147, KMP comps = 208648, Boyer-Moore comps = 103565
-
-Pattern: aaaa
-naive comps = 240619, KMP comps = 246768,
-Boyer-Moore comps = 61727
+    Tweets: Boyer-Moore
+    English Text: Boyer-Moore
+    Random Text: Boyer-Moore
+    Simple Text: Boyer-Moore
+    Repeated Text with Small Alphabet: KMP/Boyer-Moore (in different cases)
 
 
-----------------------
-Twitter: taylorswift13
-----------------------
-Pattern: up
-naive comps = 202328, KMP comps = 204222,
-Boyer-Moore comps = 103268
+Analysis: 
 
-Pattern: love
-naive comps = 201409, KMP comps = 206067,
-Boyer-Moore comps = 56616
+    1. KMP is fast when the alphabet is small and slow when the alphabet is large.
+       This is because it has more chance of failure in cases with larger alphabets.
 
-Pattern: morning
-naive comps = 197953, KMP comps = 209742,
-Boyer-Moore comps = 33992
+    2. Boyer-Moore is fast when the alphabet is large, slow when the alphabet is 
+       small. This is because when the alphabet is smaller, the pattern substring 
+       reoccurence tend to be more often. Thus the skip length tend to be smaller.
+
+
+
+
+
+
+===============================================================================
+Below are experiment results
+===============================================================================
+
+The experiments with different data (excluding data from Tweeter) are performed
+with codes in the main method in StringMatch.java.
+
+The experiments on tweets are performed with codes in the main method of 
+MatchBot.java.
+
+----- ----- ----- ----- -----
+Experiments With English Text
+----- ----- ----- ----- -----
+Text length: 576
+
+Experiment #1
+Pattern: in
+Comparisons: Naive 14, KMP 15, BoyerMoore 11
+
+Experiment #2
+Pattern: officer
+Comparisons: Naive 527, KMP 531, BoyerMoore 96
+
+Experiment #3
+Pattern: exclusively
+Comparisons: Naive 490, KMP 498, BoyerMoore 64
+
+
+----- ----- ----- ----- ----- -----
+Experiments With Large Random Text
+----- ----- ----- ----- ----- -----
+Text length: 20000
+
+Experiment #1
+Pattern: yes
+Comparisons: Naive 579, KMP 582, BoyerMoore 215
+
+Experiment #2
+Pattern: officer
+Comparisons: Naive 527, KMP 531, BoyerMoore 96
+
+Experiment #3
+Pattern: exclusively
+Comparisons: Naive 490, KMP 498, BoyerMoore 64
+
+
+----- ----- ----- ----- -----
+Experiments With Simple Text
+----- ----- ----- ----- -----
+Text length: 20000
+
+Experiment #1
+Pattern: 01000201302
+Comparisons: Naive 26594, KMP 24957, BoyerMoore 15565
+
+Experiment #2
+Pattern: 00200010203
+Comparisons: Naive 26704, KMP 24735, BoyerMoore 13309
+
+Experiment #3
+Pattern: 02301123011
+Comparisons: Naive 26704, KMP 25028, BoyerMoore 10361
+
+
+----- ----- ----- ----- ----- -----
+Experiments With Repeated Text
+----- ----- ----- ----- ----- -----
+Text length: 20000, Text Type: 01010101...
+
+Experiment #1
+Pattern: 010101
+Comparisons: Naive 6, KMP 11, BoyerMoore 6
+
+Experiment #2
+Pattern: 1010010
+Comparisons: Naive 59982, KMP 30005, BoyerMoore 49985
+
+Experiment #3
+Pattern: 0101011
+Comparisons: Naive 79976, KMP 30005, BoyerMoore 9997
+
+
+-----------------------------------------------------------------------
+The code for the following data is in the main method of MatchBot.java
+-----------------------------------------------------------------------
+
+----- ----- ----- ----- ----- 
+Experiments With Real Tweets
+----- ----- ----- ----- ----- 
+Statistics Set 1 
+Account: realdonaldtrump, Pattern: Media
+  Naive comps = 57855
+  KMP comps = 59829
+  Boyer-Moore comps = 13807
+
+Statistics Set 2 
+Account: realdonaldtrump, Pattern: of
+  Naive comps = 50558
+  KMP comps = 50901
+  Boyer-Moore comps = 25349
+
+Statistics Set 3 
+Account: realdonaldtrump, Pattern: aaaa
+  Naive comps = 61696
+  KMP comps = 63235
+  Boyer-Moore comps = 15857
+
+Statistics Set 4 
+Account: taylorswift13, Pattern: up
+  Naive comps = 53816
+  KMP comps = 54300
+  Boyer-Moore comps = 27483
+
+Statistics Set 5 
+Account: taylorswift13, Pattern: love
+  Naive comps = 53556
+  KMP comps = 54732
+  Boyer-Moore comps = 14991
+
+Statistics Set 6 
+Account: taylorswift13, Pattern: morning
+  Naive comps = 52544
+  KMP comps = 55494
+  Boyer-Moore comps = 8965
+
+Statistics Set 7 
+Account: idsnews, Pattern: has
+  Naive comps = 59357
+  KMP comps = 60161
+  Boyer-Moore comps = 21795
+
+Statistics Set 8 
+Account: idsnews, Pattern: university
+  Naive comps = 56599
+  KMP comps = 61041
+  Boyer-Moore comps = 7646
+
+Statistics Set 9 
+Account: idsnews, Pattern: this
+  Naive comps = 60423
+  KMP comps = 61273
+  Boyer-Moore comps = 16430
+
+Statistics Set 10 
+Account: nytimes, Pattern: campaign
+  Naive comps = 55760
+  KMP comps = 59084
+  Boyer-Moore comps = 8399
+
+Statistics Set 11 
+Account: nytimes, Pattern: Sunday
+  Naive comps = 55763
+  KMP comps = 58275
+  Boyer-Moore comps = 10709
+
+Statistics Set 12 
+Account: nytimes, Pattern: of
+  Naive comps = 48150
+  KMP comps = 48486
+  Boyer-Moore comps = 24155

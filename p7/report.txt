@@ -134,20 +134,26 @@
         large number of wires (e.g. 200), we use run less wiring orders to reduce
         program running time.
 
-    (3)
-        Successes
-            1) Successes on individual input files: 
-                 All successes (Able to find valid solutions for all files in less than 1 sec).
-	    2) Able to find the optimal solution for 1 wire
-            3) Able to run the hugh_01 board with in less than/around 1 sec (on my machine)
-            4) Able to run other sample files in very short time
+5. Successes and failures
+    1) Successes on individual input files: 
+        All successes (Able to find valid solutions for all files in less than 1 sec).
+
+        - small_00 - small_06, small_09 - small_11 : 
+            Finds optimal solution in less than 0.1 sec
+	- small_07 and small_08:
+            My solutions are not the optimal solution. But somewhat optimized solutions 
+            are given. And messages about not being able to connect a certain wire is 
+            given to user in both the console and the GUI.
+        - medium/big files:
+            Able to run within 0.1 sec
+        - huge file
+            Able to run within/around 1 sec
+       
+       General other successes
+	 Able to find the optimal solution for 1 wire
             
-        Failures
-            For small_07 and small_08, my solutions are not the optimal solution. But
-            somewhat optimized solutions are give.
 
-
-5. GUI
+6. GUI
 
    Directions:
    1. Simply write the file name (without extension) to the String fileNameNoExt in my driver.
@@ -158,12 +164,12 @@
    Features:
    1. Row and column numbers are displayed, in grey along the sides of the chip.
    2. Wires are displayed in different colors to separate each other. You are encouraged to run
-      the medium sized chips and enjoy the beautiful board displayed!
+      the medium sized (or small_10/other_05) chips and enjoy the beautiful board displayed!
    3. Wire ends are displayed in bold font.
    4. User Interaction: When you rest your pointer on a cell, the tip text will tell you 
       what kind of cell this is (free or obstacle). If it is along a wire, it will tell you
-      the wire ID and the length of the wire. If it is one of the wire ends, it will also
-      tell you if it is the start or the other end.
+      the wire ID and the length of the wire (or not connected). If it is one of the wire ends, 
+      it will also tell you if it is the start or the other end.
    5. Finally but not least: my design considers your screen size and your chip size. Running 
       on different screens or running for different chips, my board and font size will change 
       accordingly to deliever a aesthetically pleasing look.

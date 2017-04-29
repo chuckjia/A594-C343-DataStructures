@@ -790,10 +790,10 @@ public class Testing {
 
 	@Test
 	public void runBenchmarks() {
-		// runBenchmarksFor("small");
+		runBenchmarksFor("small");
 		// runBenchmarksFor("small_07");		
-		// runBenchmarksFor("medium");
-		// runBenchmarksFor("big");
+		runBenchmarksFor("medium");
+		//runBenchmarksFor("big");
 		// runBenchmarksFor("huge");
 	}
 

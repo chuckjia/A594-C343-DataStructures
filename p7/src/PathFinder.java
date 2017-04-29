@@ -2,6 +2,7 @@ import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class PathFinder {
 	public static Map<Integer, Path> connectAllWires(Chip chip) {
 		int n = chip.wires.size();
 		if (n <= 4)
-			return connectAllWires_OptimalSoln(chip);
+			return connectAllWires_AllOrders(chip);
 		if (n <= 8) 
 			return connectAllWires_EarlyStop(chip);
 		return connectAllWires_Fast(chip);
@@ -44,13 +45,13 @@ public class PathFinder {
 	 * wires or if multiple wires have the same largest number of wire 
 	 * connected, the one with the shortest wiring length).
 	 * 
-	 * The method finds the optimal solution, but it works slow (O(n!) times
-	 * of wiring) when number of wires is large.
+	 * The method finds the (to some extent) optimal solution, but it works 
+	 * slow (O(n!) times of wiring) when number of wires is large.
 	 * @param chip The chip
 	 * @return A map between wire id and a wire path.
 	 * @author Chuck Jia
 	 */
-	public static Map<Integer, Path> connectAllWires_OptimalSoln(Chip chip) {
+	public static Map<Integer, Path> connectAllWires_AllOrders(Chip chip) {
 		Map<Integer, Path> layout = new HashMap<>();
 		/*
 		 * Sort the wire order according to the Manhattan distance between the
@@ -59,18 +60,17 @@ public class PathFinder {
 		 * As a result, it improves efficiency by reducing the number of the 
 		 * copy-over steps in permuteAllOrders() when better solutions are found. 
 		 */
-		List<Wire> wires = chip.wires;
+		List<Wire> wires = new LinkedList<>(chip.wires);
 		wires.sort((x, y) -> x.separation() - y.separation());
-		int n = chip.wires.size(); // Number of wires
+		int n = wires.size(); // Number of wires
 		int[] a = new int[n]; // Array for permutation of wiring orders 
 		for (int i = 0; i < n; i++)
 			a[i] = i;		
 		// Run Dijkstra through every possible wiring order
-		permuteAllOrders(a, 0, chip, layout);
+		permuteAllOrders(a, 0, chip, wires, layout);
 		// Layout paths on the grid. Used for displaying path in the GUI
 		layoutPaths(chip, layout); 
 		// Sort to return the wires back to their original order
-		wires.sort((x, y) -> x.wireId - y.wireId);
 		if (layout.size() != n)
 			for (Wire wire : wires) 
 				if (!layout.containsKey(wire.wireId)) 
@@ -105,18 +105,18 @@ public class PathFinder {
 		 * by reducing the number of the copy-over steps in permuteAllOrders() 
 		 * when better solutions are found. 
 		 */
-		List<Wire> wires = chip.wires;
+		List<Wire> wires = new LinkedList<>(chip.wires);
 		wires.sort((x, y) -> x.separation() - y.separation());
-		int n = chip.wires.size(); // Number of wires
+		int n = wires.size(); // Number of wires
 		boolean[] go = { true }; // Marker for early stopping
 		int[] a = new int[n]; // Array for permutation of wiring orders 
 		for (int i = 0; i < n; i++)
 			a[i] = i;
-		// Run Dijkstra through every possible wiring order and stop immediate
-		permuteWithEarlyStop(a, 0, chip, layout, go);
+		// Run Dijkstra through every possible wiring order and stop immediately when
+		// a solution that connects all wires is found
+		permuteWithEarlyStop(a, 0, chip, wires, layout, go);
 		layoutPaths(chip, layout);
 		// Sort to return the wires back to their original order
-		wires.sort((x, y) -> x.wireId - y.wireId);
 		if (layout.size() != n)
 				for (Wire wire : wires) 
 					if (!layout.containsKey(wire.wireId)) 
@@ -161,15 +161,13 @@ public class PathFinder {
 	 * @param layout A map between wire id and a wire path.
 	 * @author Chuck Jia
 	 */
-	private static void permuteAllOrders(int[] a, int start, Chip chip, Map<Integer, Path> layout) {
+	private static void permuteAllOrders(int[] a, int start, Chip chip, List<Wire> wires, Map<Integer, Path> layout) {
 		int n = a.length;
 		if (start == n - 1) {
 			Map<Integer, Path> newLayout = new HashMap<>();
 			chip.layout(); // Clear the previous layout. Used as markers
-			for (int i = 0; i < n; i++) {
-				Wire wire = chip.wires.get(a[i]);
-				dijkstra(wire, chip, newLayout);
-			}
+			for (int i = 0; i < n; i++)
+				dijkstra(wires.get(a[i]), chip, newLayout);
 			if (newLayout.size() > layout.size()) { // If new layout connects more wires
 				layout.clear();
 				layout.putAll(newLayout);
@@ -184,7 +182,7 @@ public class PathFinder {
 
 		for (int i = start; i < n; i++) {
 			swap(a, start, i);
-			permuteAllOrders(a, start + 1, chip, layout);
+			permuteAllOrders(a, start + 1, chip, wires, layout);
 			swap(a, start, i);
 		}
 
@@ -202,9 +200,8 @@ public class PathFinder {
 	 * @param layout A map between wire id and a wire path.
 	 * @author Chuck Jia
 	 */
-	private static void permuteWithEarlyStop(int[] a, int start, Chip chip, Map<Integer, Path> layout, boolean[] go) {
+	private static void permuteWithEarlyStop(int[] a, int start, Chip chip, List<Wire> wires, Map<Integer, Path> layout, boolean[] go) {
 		int n = a.length;
-		List<Wire> wires = chip.wires;
 		if (start == n - 1) {
 			Map<Integer, Path> newLayout = new HashMap<>();
 			chip.layout(); // Clear the previous layout. Used as markers
@@ -228,7 +225,7 @@ public class PathFinder {
 
 		for (int i = start; i < n && go[0]; i++) {
 			swap(a, start, i);
-			permuteWithEarlyStop(a, start + 1, chip, layout, go);
+			permuteWithEarlyStop(a, start + 1, chip, wires, layout, go);
 			swap(a, start, i);
 		}
 	}
@@ -240,7 +237,7 @@ public class PathFinder {
 	 * @param i The index of the first of the pair to be swapped
 	 * @param j The index of the second of the pair to be swapped
 	 */
-	private static void swap(int[] a, int i, int j) {
+	protected static void swap(int[] a, int i, int j) {
 		int t = a[i];
 		a[i] = a[j];
 		a[j] = t;
@@ -328,75 +325,7 @@ public class PathFinder {
 			return false;
 		}
 	}
-
-
-	/**
-	 * Uses fast removal method to approximate minimal path
-	 * @param wire The wire to be connected.
-	 * @param chip The chip.
-	 * @param layout A map between wire id and a wire path.
-	 * @return True if wire is successfully connected, false if failed.
-	 */	
-	public static boolean dijkstraFast(Wire wire, Chip chip, Map<Integer, Path> layout) {		
-		Map<Coord, Integer> grid = chip.grid;
-		Dimension dim = chip.dim;
-		int width = dim.width, height = dim.height, id = wire.wireId;
-		Coord from = wire.from, to = wire.to;
-
-		int[][] dist = new int[width][height]; // Holds the minimum distance from "from"
-		Coord[][] parent = new Coord[width][height]; // Holds the parent coordinates along the shortest path
-		boolean[][] visited = new boolean[width][height]; // Holds markers for checking if a coord's minimal distance is decided
-
-		Comparator<Coord> comp = (a, b) -> Coord.manhattanDist(a, to) - Coord.manhattanDist(b, to);
-		java.util.PriorityQueue<Coord> candidates = new java.util.PriorityQueue<>(comp);
-
-		// Populating dist and others with default values. Parent does not need pre-population.
-		grid.put(to, Constants.FREE); // Temporarily set to improve efficiency and will be reset later
-		for (int i = 0; i < width; i++)
-			for (int j = 0; j < height; j++) 
-				if (grid.get(new Coord(i, j)) == Constants.FREE)
-					dist[i][j] = Integer.MAX_VALUE;
-
-		dist[from.getX()][from.getY()] = 0;
-
-		Coord p = from;
-		candidates.offer(p);
-		while (!candidates.isEmpty() && !p.equals(to) && dist[p.getX()][p.getY()] < Integer.MAX_VALUE) {
-			for (Coord q : p.neighbors(dim)){ // Do nothing if y is occupied b/c y wouldn't be in others
-				int qX = q.getX(), qY = q.getY();
-				if (grid.get(q) == Constants.FREE && !visited[qX][qY]) { // Can use/not use others.contains
-					int alt = dist[p.getX()][p.getY()] + 1;
-					if (alt < dist[qX][qY]) {
-						dist[qX][qY] = alt;
-						parent[qX][qY] = p;
-						candidates.offer(q);
-					}
-				}
-			}
-			p = candidates.poll();
-			visited[p.getX()][p.getY()] = true;
-		}
-
-		Path path = new Path(wire);
-		if (parent[to.getX()][to.getY()] != null) {
-			Coord q = to;
-			while (!q.equals(from)){
-				path.add(1, q); // Add to position 1
-				grid.put(q, id);
-				q = parent[q.getX()][q.getY()];
-			}
-			layout.put(id, path);
-			return true;
-		} else if (from.equals(to)) {
-			layout.put(id, path);
-			grid.put(to, id);
-			return true; 
-		} else {
-			grid.put(to, id);
-			return false;
-		}
-	}
-
+	
 
 	/**
 	 * TODO

@@ -34,9 +34,7 @@ public class Obstacle {
 	 */
 	public boolean contains(Coord coord) {
 		int x = coord.getX(), y = coord.getY();
-		if (x >= upperLeft.x && x <= lowerRight.x && y >=lowerRight.y && y <= upperLeft.y)
-			return true;
-		return false;
+		return x >= upperLeft.x && x <= lowerRight.x && y >=upperLeft.y && y <= lowerRight.y;
 	}
 
 	/**

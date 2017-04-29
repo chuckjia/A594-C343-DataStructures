@@ -1,0 +1,181 @@
+1. Solution strategy
+
+  In the program, I have used the following 3 different strategies 
+  corresponding to different sizes and difficulty levels of a problem:
+
+    For any problem, first of all, I sort the wire by the Manhattan 
+    distance between the two ends of the wire (in order to help with the
+    searching efficiency).
+
+    (1) For a problem with small number of wires, I permute the order of 
+        wiring. For each order of wiring, I run the Dijkstra algorithm
+        (explained in detail in part 2 below) to connect all wires using 
+        that specific order. Then I take the best solution among all the 
+        solutions (i.e. the solution with the largest number of wires
+        connected or if multiple such solutions exist, the one with the
+        least wire usage).
+	
+	- How wires are connected: Wires are connected one by one using
+          the Dijkstra algorithm on the chip.
+
+        - What to do when unable to make a connection: In this case, the 
+          program explores all possibilities of wiring orders and takes 
+          the best solution. As long as a solution can be found by some  
+          wiring order, the program will find it. We never stop at a 
+          specific solution. No matter whether we make all connections  
+          in one run, we always exhaust all the wiring orders and take 
+          the best.
+        
+    (2) For a problem with medium sized number of wires, I permute the
+        order of wiring and run Dijkstra to connect all wires by each order,
+        but in this case I stop immediately whenever a solution is found
+        that connects all wires. If no such solution is found, then the
+        program stops when all orders are explored, then I will take the 
+        best solution produced.
+
+        - How wires are connected: Wires are connected one by one using
+          the Dijkstra algorithm on the chip.
+
+        - What to do when unable to make a connection: In this case, the
+          program explores all possibilities of wiring orders unless at 
+          some point a solution that connects all wires is found. That is,
+          unless a solution that connects everything is found, we will keep
+          trying different wiring orders to produce better solutions.
+
+    (3) For a problem with large number of wires, I run Dijkstra on all 
+        wires according to the pre-sorted order.
+
+        - How wires are connected: Wires are connected one by one using
+          the Dijkstra algorithm on the chip.
+
+        - What to do when unable to make a connection: In this case, in
+          order to achieve reasonable efficiency with Dijkstra, the 
+          program will tell user that a connection for a wire is not 
+          available and continue to connect the next wire on the chip.
+
+
+2. High level pseudo-code description of the algorithm to route one wire.
+
+    Our program follows closely the Dijkstra algorithm.
+
+    - English Description: 
+
+      (1) For all cells, we maintain a structure to store the distance of 
+          every cell from the starting end of the wire. Initiate every 
+          distance to be infinity, except for the wire starting end, we 
+          make its distance 0.
+      (2) For all cells, we maintain a structure to store the parent cells of 
+          every cell along the shortest path from the starting end of the wire.
+      (3) We also maintain a structure to mark each cell whether its minimum
+          distance from the starting end is calculated or not.
+      (4) Finally before going into calculation, we maintain a structure to 
+          hold the next candidates for shortest path.
+      (5) We go into the following loop:
+          a) While we still have candidates to choose or the destination is not 
+             marked as calculated (as in (3) above), then we choose the 
+             candidate with the shortest distance and mark it as calculated. 
+          b) Then we calculate its neighbors' distance from the wire starting 
+             end, and update if shorter distance is achieved this time. Whenever 
+             a cell's distance is calculated, we added it to the candidates 
+             structure. 
+          
+          c) Then we go back top to a) and repeat the loop.
+          (Note: The loops stop whenever no more candidates can be selected 
+           or we have reached our destination.)
+
+   - High-level Psudocode:
+
+     for every cell v: 
+         dist(v) <- infinity
+         parent(v) <- null
+         calculated(v) <- false
+
+     dist(startEnd) <- 0
+     add startend to candidates
+
+     for every neightbor v of candidatesSet:
+         dist(v) <- 1     
+         add v to candidates
+
+     while (candidates is not empty or p == destination):
+         p = next candidate (the one in candidates with the least distance)
+         remove p from candidates
+         calculated(p) <- true
+         for each neighbor v of p's if calculated(v) == false
+	     try updating v's distance
+                 if updated, add neighbor v to next candidate
+      
+      
+
+3. Data Structures
+
+    (1) HashMap<Integer, Path>: Hold and link the path ID and the path, used as
+            a representation of the result
+    (2) LinkedList<Wire>: Hold the wires and their order
+    (3) Arrays: In multiple places to store positions/distance or serve as markers.
+    (4) ArrayList: Used as the inner structure of Heap.
+    (5) Heap: This structure is adapted from p5. In addition to traditional heap 
+            features, this heap can update its priority for a specifice element 
+            whenever needed. This heap is used to store and maintain the priorities
+            of our candidates when running Dijkstra (see "2. High level pseudo-code 
+            description" above). It enables us to find the best candidates with in
+            O(log n) time.
+
+4. Heuristics
+   
+    (1) Before we run Dijkstra, we assume that cells that are close to each other
+        have better chance of being connected (or in larger danger of being blocked
+        by other wires). Therefore we sort the wires according to the Manhattan 
+        distance between their two ends, in order to improve efficiency and achieve
+        better solution.
+
+    (2) In larger boards, we assume that the space is large and wires are less likely
+        to block each other. Also since it is unrealistic to run every order on a
+        large number of wires (e.g. 200), we use run less wiring orders to reduce
+        program running time.
+
+    (3)
+        Successes
+            1) Successes on individual input files: 
+                 All successes (Able to find valid solutions for all files in less than 1 sec).
+	    2) Able to find the optimal solution for 1 wire
+            3) Able to run the hugh_01 board with in less than/around 1 sec (on my machine)
+            4) Able to run other sample files in very short time
+            
+        Failures
+            For small_07 and small_08, my solutions are not the optimal solution. But
+            somewhat optimized solutions are give.
+
+
+5. GUI
+
+   Directions:
+   1. Simply write the file name (without extension) to the String fileNameNoExt in my driver.
+   2. When you run the driver in my project, the program will produce a GUI showing the chip
+      with wiring solutions on it.
+
+
+   Features:
+   1. Row and column numbers are displayed, in grey along the sides of the chip.
+   2. Wires are displayed in different colors to separate each other. You are encouraged to run
+      the medium sized chips and enjoy the beautiful board displayed!
+   3. Wire ends are displayed in bold font.
+   4. User Interaction: When you rest your pointer on a cell, the tip text will tell you 
+      what kind of cell this is (free or obstacle). If it is along a wire, it will tell you
+      the wire ID and the length of the wire. If it is one of the wire ends, it will also
+      tell you if it is the start or the other end.
+   5. Finally but not least: my design considers your screen size and your chip size. Running 
+      on different screens or running for different chips, my board and font size will change 
+      accordingly to deliever a aesthetically pleasing look.
+
+   
+                   
+
+
+
+
+
+
+
+
+

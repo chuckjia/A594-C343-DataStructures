@@ -26,7 +26,7 @@ public class Driver {
 		System.out.println(Constants.TITLE);
 		System.out.println("Start the GUI...");
 
-		String fileNameNoExt = "small_04";
+		String fileNameNoExt = "medium_01";
 		File file = new File(Constants.INPUTS_FOLDER + "\\" + fileNameNoExt + ".in");
 		Chip chip = new Chip(file);
 		Map<Integer, Path> paths = PathFinder.connectAllWires(chip);
